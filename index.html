@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="EduDescuentos">
   <meta name="theme-color" content="#0f0f0f">
-  <title>EduDescuentos - Gestión de Descuentos Docentes</title>
+  <title>EduDescuentos - Gestión de Préstamos y Descuentos</title>
   <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiRWR1RGVzY3VlbnRvcyIsInNob3J0X25hbWUiOiJFRGVzY3VlbnRvcyIsInN0YXJ0X3VybCI6IiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwZjBmMGYiLCJ0aGVtZV9jb2xvciI6IiMwZjBmMGYifQ==">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -22,7 +22,6 @@
     @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
     @keyframes spin { to { transform: rotate(360deg); } }
     @keyframes slideInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
-    @keyframes countUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     .animate-fade { animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
     .animate-scale { animation: scaleIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
@@ -42,6 +41,7 @@
     .btn-danger { background: linear-gradient(135deg, #dc2626, #f87171); }
     .btn-success { background: linear-gradient(135deg, #059669, #34d399); }
     .btn-info { background: linear-gradient(135deg, #2563eb, #60a5fa); }
+    .btn-warning { background: linear-gradient(135deg, #d97706, #fbbf24); color: #000; }
     .btn-block { width: 100%; }
     .btn-sm { padding: 10px 16px; font-size: 13px; }
     .btn-xs { padding: 6px 12px; font-size: 12px; }
@@ -67,6 +67,9 @@
     .radio-icon { font-size: 24px; margin-bottom: 6px; }
     .radio-label { font-size: 13px; font-weight: 600; color: var(--text-primary); }
     .radio-sublabel { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .checkbox-row { display: flex; align-items: center; gap: 12px; padding: 14px; background: var(--bg-glass); border: 1px solid var(--border-glass); border-radius: var(--radius-sm); cursor: pointer; margin-bottom: 16px; }
+    .checkbox-row input { width: 20px; height: 20px; accent-color: var(--accent); }
+    .checkbox-row label { font-size: 14px; font-weight: 500; color: var(--text-primary); cursor: pointer; }
     .list-item { display: flex; align-items: center; gap: 14px; padding: 16px; background: var(--bg-card); border-radius: var(--radius-sm); margin-bottom: 10px; border: 1px solid var(--border-glass); transition: all 0.25s ease; cursor: pointer; position: relative; overflow: hidden; }
     .list-item::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: linear-gradient(180deg, var(--accent), var(--accent-light)); opacity: 0; transition: opacity 0.3s; }
     .list-item:active { transform: scale(0.98); background: rgba(255,255,255,0.04); }
@@ -85,6 +88,7 @@
     .badge-warning { background: rgba(251,191,36,0.12); color: var(--warning); }
     .badge-danger { background: rgba(248,113,113,0.12); color: var(--danger); }
     .badge-info { background: rgba(96,165,250,0.12); color: var(--info); }
+    .badge-liquidation { background: rgba(220,38,38,0.15); color: #fca5a5; }
     .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px; }
     .stat-card { background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 20px; position: relative; overflow: hidden; transition: transform 0.3s; }
     .stat-card:active { transform: scale(0.97); }
@@ -98,9 +102,6 @@
     .stat-icon.blue { background: rgba(96,165,250,0.12); color: var(--info); }
     .stat-label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; font-weight: 600; }
     .stat-value { font-size: 22px; font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
-    .stat-delta { font-size: 12px; margin-top: 6px; font-weight: 500; }
-    .stat-delta.up { color: var(--success); }
-    .stat-delta.down { color: var(--danger); }
     .app-header { position: sticky; top: 0; z-index: 50; background: rgba(15,15,15,0.88); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-bottom: 1px solid var(--border-glass); padding: 16px 20px; padding-top: calc(16px + env(safe-area-inset-top)); }
     .app-header-content { display: flex; align-items: center; justify-content: space-between; }
     .app-header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
@@ -140,8 +141,8 @@
     .timeline-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; z-index: 2; }
     .timeline-dot.loan { background: rgba(248,113,113,0.15); color: var(--danger); }
     .timeline-dot.payment { background: rgba(52,211,153,0.15); color: var(--success); }
-    .timeline-dot.salary { background: rgba(99,102,241,0.15); color: var(--accent-light); }
     .timeline-dot.installment { background: rgba(251,191,36,0.15); color: var(--warning); }
+    .timeline-dot.liquidation { background: rgba(220,38,38,0.15); color: #fca5a5; }
     .timeline-dot svg { width: 14px; height: 14px; }
     .timeline-content { flex: 1; }
     .timeline-title { font-size: 15px; font-weight: 600; margin-bottom: 3px; }
@@ -152,10 +153,6 @@
     .timeline-amount.positive { color: var(--success); }
     .action-row { display: flex; gap: 10px; padding: 16px 20px; }
     .action-row .btn { flex: 1; }
-    .search-bar { padding: 12px 20px; position: sticky; top: calc(60px + env(safe-area-inset-top)); z-index: 40; background: rgba(15,15,15,0.9); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-glass); }
-    .search-input { width: 100%; padding: 12px 16px 12px 40px; background: var(--bg-glass); border: 1px solid var(--border-glass); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 15px; outline: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='rgba(255,255,255,0.3)' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: left 14px center; }
-    .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
-    .search-input::placeholder { color: var(--text-muted); }
     .menu-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 150; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
     .menu-overlay.active { opacity: 1; pointer-events: all; }
     .menu-sheet { position: fixed; left: 0; right: 0; bottom: 0; background: var(--bg-secondary); border-radius: var(--radius-lg) var(--radius-lg) 0 0; z-index: 151; transform: translateY(105%); transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); padding: 20px; padding-bottom: calc(32px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border-glass); }
@@ -171,7 +168,6 @@
     .progress-fill.success { background: linear-gradient(90deg, var(--success), #6ee7b7); }
     .progress-fill.warning { background: linear-gradient(90deg, var(--warning), #fcd34d); }
     .progress-fill.danger { background: linear-gradient(90deg, var(--danger), #fca5a5); }
-    .progress-fill.info { background: linear-gradient(90deg, var(--info), #93c5fd); }
     .loan-card { padding: 20px; background: var(--bg-card); border-radius: var(--radius-md); border: 1px solid var(--border-glass); margin-bottom: 12px; }
     .loan-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
     .loan-card-title { font-size: 15px; font-weight: 600; }
@@ -186,10 +182,6 @@
     .back-btn svg { width: 18px; height: 18px; }
     .screen { display: none; }
     .screen.active { display: block; animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-    .delete-confirm { background: rgba(220,38,38,0.08); border: 1px solid rgba(248,113,113,0.2); border-radius: var(--radius-sm); padding: 16px; margin-top: 16px; }
-    .delete-confirm p { font-size: 14px; color: var(--danger); margin-bottom: 12px; }
-    .delete-confirm-actions { display: flex; gap: 8px; }
-    .delete-confirm-actions .btn { flex: 1; }
     .installment-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 16px; }
     .installment-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 12px; font-weight: 600; background: var(--bg-glass); border: 1px solid var(--border-glass); color: var(--text-muted); }
     .installment-cell.paid { background: rgba(52,211,153,0.15); border-color: rgba(52,211,153,0.3); color: var(--success); }
@@ -207,22 +199,19 @@
     .condition-label { color: var(--text-secondary); }
     .condition-value { font-weight: 600; color: var(--text-primary); }
     .type-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-    .type-badge.advance { background: rgba(99,102,241,0.12); color: var(--accent-light); }
-    .type-badge.cafeteria { background: rgba(251,191,36,0.12); color: var(--warning); }
-    .type-badge.other { background: rgba(148,163,184,0.12); color: #94a3b8; }
+    .type-badge.prestamo { background: rgba(96,165,250,0.12); color: var(--info); }
+    .type-badge.descuento { background: rgba(251,191,36,0.12); color: var(--warning); }
+    .type-badge.liquidacion { background: rgba(220,38,38,0.15); color: #fca5a5; }
     .dashboard-card { background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 20px; margin-bottom: 12px; }
     .dashboard-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
     .dashboard-card-title { font-size: 15px; font-weight: 600; }
     .dashboard-card-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-    .upcoming-list { margin-top: 12px; }
-    .upcoming-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-glass); border-radius: var(--radius-sm); margin-bottom: 8px; border: 1px solid var(--border-glass); }
-    .upcoming-date { width: 44px; height: 44px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), #7c3aed); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
-    .upcoming-date-day { font-size: 18px; font-weight: 700; line-height: 1; }
-    .upcoming-date-month { font-size: 9px; text-transform: uppercase; margin-top: 2px; }
-    .upcoming-content { flex: 1; min-width: 0; }
-    .upcoming-title { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .upcoming-desc { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
-    .upcoming-amount { font-size: 15px; font-weight: 700; color: var(--warning); flex-shrink: 0; }
+    .alert-card { background: linear-gradient(135deg, rgba(220,38,38,0.1), rgba(248,113,113,0.05)); border: 1px solid rgba(248,113,113,0.2); border-radius: var(--radius-md); padding: 16px; margin: 0 20px 12px; }
+    .alert-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .alert-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(248,113,113,0.15); display: flex; align-items: center; justify-content: center; color: var(--danger); }
+    .alert-title { font-size: 15px; font-weight: 600; color: var(--danger); }
+    .alert-text { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+    .alert-amount { font-size: 18px; font-weight: 700; color: var(--danger); margin-top: 8px; }
     .payroll-card { background: linear-gradient(135deg, rgba(79,70,229,0.15), rgba(124,58,237,0.1)); border: 1px solid rgba(99,102,241,0.2); border-radius: var(--radius-md); padding: 20px; margin: 0 20px 20px; }
     .payroll-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
     .payroll-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.05); }
@@ -235,13 +224,11 @@
     .copy-btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; background: var(--bg-glass); border: 1px solid var(--border-glass); border-radius: var(--radius-sm); color: var(--text-secondary); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
     .copy-btn:active { background: rgba(255,255,255,0.08); transform: scale(0.96); }
     .copy-btn svg { width: 16px; height: 16px; }
-    .copy-area { background: var(--bg-primary); border: 1px solid var(--border-glass); border-radius: var(--radius-sm); padding: 16px; font-family: 'SF Mono', Monaco, monospace; font-size: 13px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; word-break: break-word; max-height: 300px; overflow-y: auto; margin-bottom: 16px; }
-    .payroll-teacher-card { background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 16px; margin-bottom: 10px; }
-    .payroll-teacher-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .payroll-teacher-name { font-size: 15px; font-weight: 600; }
-    .payroll-teacher-net { font-size: 16px; font-weight: 700; color: var(--success); }
-    .payroll-teacher-detail { font-size: 13px; color: var(--text-secondary); }
-    .payroll-teacher-detail span { color: var(--danger); font-weight: 600; }
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: rgba(15,15,15,0.92); backdrop-filter: blur(20px); border-top: 1px solid var(--border-glass); padding-bottom: env(safe-area-inset-bottom); z-index: 90; }
+    .bottom-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 0; color: var(--text-muted); font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; background: none; }
+    .bottom-nav-item.active { color: var(--accent-light); }
+    .bottom-nav-item svg { width: 22px; height: 22px; margin-bottom: 4px; }
+    .bottom-nav-item:active { transform: scale(0.92); }
   </style>
 </head>
 <body>
@@ -252,7 +239,7 @@
         <div class="app-header-content">
           <div>
             <h1>EduDescuentos</h1>
-            <p>Gestión de descuentos de nómina</p>
+            <p>Préstamos y descuentos de nómina</p>
           </div>
           <div class="header-actions">
             <button class="header-btn" onclick="showDataMenu()" title="Datos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-6M6 20V10M18 20V4"/></svg></button>
@@ -263,14 +250,14 @@
       <div class="content">
         <div class="stats-grid" id="dashboardStats">
           <div class="stat-card animate-fade stagger-1">
-            <div class="stat-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-            <div class="stat-label">Total Adeudado</div>
-            <div class="stat-value currency" id="statTotalLoaned">$0</div>
+            <div class="stat-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+            <div class="stat-label">Préstamos Activos</div>
+            <div class="stat-value currency" id="statTotalPrestamos">$0</div>
           </div>
           <div class="stat-card animate-fade stagger-2">
-            <div class="stat-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div class="stat-label">Ya Descontado</div>
-            <div class="stat-value currency" id="statTotalRecovered">$0</div>
+            <div class="stat-icon amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+            <div class="stat-label">Descuentos Activos</div>
+            <div class="stat-value currency" id="statTotalDescuentos">$0</div>
           </div>
           <div class="stat-card animate-fade stagger-3">
             <div class="stat-icon red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
@@ -278,11 +265,13 @@
             <div class="stat-value currency" id="statTotalPending">$0</div>
           </div>
           <div class="stat-card animate-fade stagger-4">
-            <div class="stat-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-            <div class="stat-label">Descuentos este mes</div>
-            <div class="stat-value currency" id="statThisMonth">$0</div>
+            <div class="stat-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+            <div class="stat-label">Liquidación</div>
+            <div class="stat-value currency" id="statLiquidacion">$0</div>
           </div>
         </div>
+        
+        <div id="liquidationAlerts"></div>
         
         <div style="padding:0 20px 20px;">
           <button class="btn btn-primary btn-block" onclick="openSheetMonthPayroll()">
@@ -291,13 +280,22 @@
           </button>
         </div>
         
-        <div class="section-title">Próximos descuentos programados</div>
-        <div id="upcomingInstallments"></div>
-        
         <div class="section-title">Docentes</div>
         <div id="teachersList"></div>
       </div>
-      <button class="fab" onclick="openSheetAddLoan()" title="Nuevo registro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+    </div>
+    
+    <!-- SCREEN: LIQUIDATION -->
+    <div class="screen" id="screenLiquidation">
+      <div class="app-header">
+        <div class="app-header-content">
+          <div>
+            <h1>Liquidación</h1>
+            <p>Descuentos de liquidación final</p>
+          </div>
+        </div>
+      </div>
+      <div class="content" id="liquidationContent"></div>
     </div>
     
     <!-- SCREEN: TEACHER DETAIL -->
@@ -308,18 +306,30 @@
         </div>
       </div>
       <div id="teacherDetailContent"></div>
-      <button class="fab" onclick="openSheetAddLoanForTeacher()" title="Nuevo registro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+      <button class="fab" onclick="openSheetAddRecordForTeacher()" title="Nuevo registro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
     </div>
     
-    <!-- SCREEN: LOAN DETAIL -->
-    <div class="screen" id="screenLoan">
+    <!-- SCREEN: RECORD DETAIL -->
+    <div class="screen" id="screenRecord">
       <div class="app-header">
         <div class="app-header-content">
-          <button class="back-btn" onclick="goBackFromLoan()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Volver</button>
+          <button class="back-btn" onclick="goBackFromRecord()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Volver</button>
         </div>
       </div>
-      <div id="loanDetailContent"></div>
+      <div id="recordDetailContent"></div>
     </div>
+  </div>
+  
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <button class="bottom-nav-item active" id="navDashboard" onclick="showScreen('screenDashboard'); setNavActive('navDashboard');">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Inicio
+    </button>
+    <button class="bottom-nav-item" id="navLiquidation" onclick="showScreen('screenLiquidation'); renderLiquidation(); setNavActive('navLiquidation');">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Liquidación
+    </button>
   </div>
   
   <!-- BOTTOM SHEET -->
@@ -361,11 +371,11 @@
       now: () => new Date().toISOString(),
       id: () => Date.now().toString(36) + Math.random().toString(36).substr(2, 5)
     };
-    const KEYS = { TEACHERS: 'ep_teachers', LOANS: 'ep_loans', PAYMENTS: 'ep_payments' };
+    const KEYS = { TEACHERS: 'ep_teachers', RECORDS: 'ep_records', PAYMENTS: 'ep_payments' };
     function getTeachers() { return DB.get(KEYS.TEACHERS, []); }
     function setTeachers(t) { DB.set(KEYS.TEACHERS, t); }
-    function getLoans() { return DB.get(KEYS.LOANS, []); }
-    function setLoans(l) { DB.set(KEYS.LOANS, l); }
+    function getRecords() { return DB.get(KEYS.RECORDS, []); }
+    function setRecords(r) { DB.set(KEYS.RECORDS, r); }
     function getPayments() { return DB.get(KEYS.PAYMENTS, []); }
     function setPayments(p) { DB.set(KEYS.PAYMENTS, p); }
     
@@ -393,6 +403,10 @@
       $(id).classList.add('active');
       window.scrollTo(0, 0);
     }
+    function setNavActive(id) {
+      document.querySelectorAll('.bottom-nav-item').forEach(n => n.classList.remove('active'));
+      $(id).classList.add('active');
+    }
     function formatCurrency(n) {
       return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(n || 0);
     }
@@ -404,7 +418,7 @@
     function formatMonthYear(d) {
       if (!d) return '';
       const date = new Date(d + 'T00:00:00');
-      return date.toLocaleDateString('es-CO', { month: 'short', year: 'numeric' });
+      return date.toLocaleDateString('es-CO', { month: 'long', year: 'numeric' });
     }
     function escapeHtml(s) {
       const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML;
@@ -421,10 +435,9 @@
     function todayStr() {
       return new Date().toISOString().split('T')[0];
     }
-    function daysBetween(a, b) {
-      const d1 = new Date(a + 'T00:00:00');
-      const d2 = new Date(b + 'T00:00:00');
-      return Math.floor((d2 - d1) / (1000 * 60 * 60 * 24));
+    function getMonthName(dateStr) {
+      const d = new Date(dateStr + 'T00:00:00');
+      return d.toLocaleDateString('es-CO', { month: 'long' });
     }
     function copyToClipboard(text) {
       if (navigator.clipboard) {
@@ -441,66 +454,52 @@
     }
     
     // ===== SERVICE WORKER =====
-    const swCode = `const CACHE='edu-descuentos-v2';self.addEventListener('install',e=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(c=>c!==CACHE).map(c=>caches.delete(c))))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{const c=res.clone();caches.open(CACHE).then(ca=>ca.put(e.request,c));return res;})).catch(()=>caches.match(e.request))));`;
+    const swCode = `const CACHE='edu-descuentos-v3';self.addEventListener('install',e=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(c=>c!==CACHE).map(c=>caches.delete(c))))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{const c=res.clone();caches.open(CACHE).then(ca=>ca.put(e.request,c));return res;})).catch(()=>caches.match(e.request))));`;
     const swBlob = new Blob([swCode], { type: 'application/javascript' });
     const swUrl = URL.createObjectURL(swBlob);
     if ('serviceWorker' in navigator) navigator.serviceWorker.register(swUrl).catch(()=>{});
     
-    // ===== LOAN TYPE LABELS =====
-    const LOAN_TYPES = {
-      advance: { label: 'Adelanto de salario', icon: '💰', class: 'advance' },
-      cafeteria: { label: 'Merienda / Cafetería', icon: '🍽️', class: 'cafeteria' },
-      other: { label: 'Otro consumo', icon: '📋', class: 'other' }
+    // ===== RECORD TYPE LABELS =====
+    const RECORD_TYPES = {
+      prestamo: { label: 'Préstamo', icon: '💰', class: 'prestamo' },
+      descuento: { label: 'Descuento', icon: '📋', class: 'descuento' }
     };
     
     // ===== CALCULATIONS =====
-    function getLoanPayments(loanId) {
-      return getPayments().filter(p => p.loanId === loanId).sort((a, b) => new Date(a.date) - new Date(b.date));
+    function getRecordPayments(recordId) {
+      return getPayments().filter(p => p.recordId === recordId).sort((a, b) => new Date(a.date) - new Date(b.date));
     }
-    function getLoanBalance(loan) {
-      const paid = getLoanPayments(loan.id).reduce((s, p) => s + (p.amount || 0), 0);
-      return Math.max(0, (loan.amount || 0) - paid);
+    function getRecordBalance(record) {
+      const paid = getRecordPayments(record.id).reduce((s, p) => s + (p.amount || 0), 0);
+      return Math.max(0, (record.amount || 0) - paid);
     }
-    function getTeacherBalance(teacherId) {
-      return getLoans().filter(l => l.teacherId === teacherId).reduce((s, l) => s + getLoanBalance(l), 0);
+    function getTeacherPrestamoBalance(teacherId) {
+      return getRecords().filter(r => r.teacherId === teacherId && r.type === 'prestamo').reduce((s, r) => s + getRecordBalance(r), 0);
     }
-    function getTeacherTotalLoaned(teacherId) {
-      return getLoans().filter(l => l.teacherId === teacherId).reduce((s, l) => s + (l.amount || 0), 0);
+    function getTeacherDescuentoBalance(teacherId) {
+      return getRecords().filter(r => r.teacherId === teacherId && r.type === 'descuento' && !r.deductFromLiquidation).reduce((s, r) => s + getRecordBalance(r), 0);
+    }
+    function getTeacherLiquidationBalance(teacherId) {
+      return getRecords().filter(r => r.teacherId === teacherId && r.type === 'descuento' && r.deductFromLiquidation).reduce((s, r) => s + getRecordBalance(r), 0);
+    }
+    function getTeacherTotalPrestamos(teacherId) {
+      return getRecords().filter(r => r.teacherId === teacherId && r.type === 'prestamo').reduce((s, r) => s + (r.amount || 0), 0);
+    }
+    function getTeacherTotalDescuentos(teacherId) {
+      return getRecords().filter(r => r.teacherId === teacherId && r.type === 'descuento').reduce((s, r) => s + (r.amount || 0), 0);
     }
     function getTeacherTotalPaid(teacherId) {
-      const loanIds = getLoans().filter(l => l.teacherId === teacherId).map(l => l.id);
-      return getPayments().filter(p => loanIds.includes(p.loanId)).reduce((s, p) => s + (p.amount || 0), 0);
-    }
-    function getAvailableSalary(teacher) {
-      return (teacher.salary || 0) - getTeacherBalance(teacher.id);
-    }
-    
-    // ===== MONTH DEDUCTIONS =====
-    function getMonthDeductions(teacherId, year, month) {
-      const loans = getLoans().filter(l => l.teacherId === teacherId && l.status !== 'paid');
-      let total = 0;
-      const details = [];
-      loans.forEach(loan => {
-        const status = getInstallmentStatus(loan);
-        status.dates.forEach((date, idx) => {
-          if (idx < status.paidCount) return;
-          const d = new Date(date + 'T00:00:00');
-          if (d.getFullYear() === year && d.getMonth() === month) {
-            total += loan.installmentAmount || 0;
-            details.push({ loan, date, installmentNumber: idx + 1, amount: loan.installmentAmount || 0 });
-          }
-        });
-      });
-      return { total, details };
+      const recordIds = getRecords().filter(r => r.teacherId === teacherId).map(r => r.id);
+      return getPayments().filter(p => recordIds.includes(p.recordId)).reduce((s, p) => s + (p.amount || 0), 0);
     }
     
     // ===== INSTALLMENT LOGIC =====
-    function generateInstallmentDates(loan) {
-      if (!loan.startDate || !loan.installments || loan.installments <= 0) return [];
+    function generateInstallmentDates(record) {
+      if (!record.startDate || !record.installments || record.installments <= 0) return [];
       const dates = [];
-      const start = new Date(loan.startDate + 'T00:00:00');
-      const day = loan.installmentDay || start.getDate();
-      for (let i = 0; i < loan.installments; i++) {
+      const start = new Date(record.startDate + 'T00:00:00');
+      const day = record.installmentDay || start.getDate();
+      for (let i = 0; i < record.installments; i++) {
         const d = new Date(start);
         d.setMonth(d.getMonth() + i);
         d.setDate(Math.min(day, new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()));
@@ -508,14 +507,14 @@
       }
       return dates;
     }
-    function getInstallmentStatus(loan) {
-      const payments = getLoanPayments(loan.id);
+    function getInstallmentStatus(record) {
+      const payments = getRecordPayments(record.id);
       const totalPaid = payments.reduce((s, p) => s + (p.amount || 0), 0);
-      const dates = generateInstallmentDates(loan);
+      const dates = generateInstallmentDates(record);
       let paidCount = 0;
       let nextIndex = -1;
       dates.forEach((date, idx) => {
-        const cumulativeExpected = (idx + 1) * (loan.installmentAmount || 0);
+        const cumulativeExpected = (idx + 1) * (record.installmentAmount || 0);
         if (totalPaid >= cumulativeExpected) {
           paidCount++;
         } else if (nextIndex === -1) {
@@ -525,72 +524,73 @@
       if (nextIndex === -1 && paidCount < dates.length) nextIndex = paidCount;
       return { dates, paidCount, totalPaid, nextIndex, remaining: dates.length - paidCount };
     }
-    function getUpcomingInstallmentsAll() {
-      const today = todayStr();
-      const upcoming = [];
-      getLoans().forEach(loan => {
-        if (loan.status === 'paid') return;
-        const status = getInstallmentStatus(loan);
-        const teacher = getTeachers().find(t => t.id === loan.teacherId);
-        if (!teacher) return;
+    function getMonthDeductions(teacherId, year, month) {
+      const records = getRecords().filter(r => r.teacherId === teacherId && r.type === 'descuento' && r.status !== 'paid' && !r.deductFromLiquidation);
+      let total = 0;
+      const details = [];
+      records.forEach(r => {
+        const status = getInstallmentStatus(r);
         status.dates.forEach((date, idx) => {
           if (idx < status.paidCount) return;
-          const days = daysBetween(today, date);
-          if (days >= -5 && days <= 35) {
-            upcoming.push({
-              date, days, teacher, loan,
-              amount: loan.installmentAmount || 0,
-              installmentNumber: idx + 1,
-              totalInstallments: status.dates.length
-            });
+          const d = new Date(date + 'T00:00:00');
+          if (d.getFullYear() === year && d.getMonth() === month) {
+            total += r.installmentAmount || 0;
+            details.push({ record: r, date, installmentNumber: idx + 1, amount: r.installmentAmount || 0 });
           }
         });
       });
-      return upcoming.sort((a, b) => new Date(a.date) - new Date(b.date));
+      return { total, details };
     }
-    function getThisMonthTotal() {
-      const now = new Date();
-      let total = 0;
-      getTeachers().forEach(t => {
-        total += getMonthDeductions(t.id, now.getFullYear(), now.getMonth()).total;
-      });
-      return total;
+    function getLiquidationRecords() {
+      return getRecords().filter(r => r.type === 'descuento' && r.deductFromLiquidation && r.status !== 'paid');
+    }
+    function getLiquidationTotal() {
+      return getLiquidationRecords().reduce((s, r) => s + getRecordBalance(r), 0);
     }
     
     // ===== DASHBOARD =====
     function renderDashboard() {
       const teachers = getTeachers();
-      const loans = getLoans();
+      const records = getRecords();
       const payments = getPayments();
-      const totalLoaned = loans.reduce((s, l) => s + (l.amount || 0), 0);
-      const totalPaid = payments.reduce((s, p) => s + (p.amount || 0), 0);
-      const totalPending = totalLoaned - totalPaid;
-      const thisMonth = getThisMonthTotal();
-      $('statTotalLoaned').textContent = formatCurrency(totalLoaned);
-      $('statTotalRecovered').textContent = formatCurrency(totalPaid);
+      const totalPrestamos = records.filter(r => r.type === 'prestamo').reduce((s, r) => s + getRecordBalance(r), 0);
+      const totalDescuentos = records.filter(r => r.type === 'descuento' && !r.deductFromLiquidation).reduce((s, r) => s + getRecordBalance(r), 0);
+      const totalLiquidacion = getLiquidationTotal();
+      const totalPending = totalPrestamos + totalDescuentos + totalLiquidacion;
+      $('statTotalPrestamos').textContent = formatCurrency(totalPrestamos);
+      $('statTotalDescuentos').textContent = formatCurrency(totalDescuentos);
       $('statTotalPending').textContent = formatCurrency(totalPending);
-      $('statThisMonth').textContent = formatCurrency(thisMonth);
+      $('statLiquidacion').textContent = formatCurrency(totalLiquidacion);
       
-      const upcoming = getUpcomingInstallmentsAll().slice(0, 5);
-      const upcomingDiv = $('upcomingInstallments');
-      if (upcoming.length === 0) {
-        upcomingDiv.innerHTML = `<div class="empty-state" style="padding:30px 0;"><div class="empty-text">No hay descuentos programados para las próximas semanas</div></div>`;
+      // Liquidation alerts (show in Nov, Dec, Jan)
+      const now = new Date();
+      const currentMonth = now.getMonth();
+      const alertDiv = $('liquidationAlerts');
+      const liqRecords = getLiquidationRecords();
+      if ((currentMonth >= 10 || currentMonth <= 0) && liqRecords.length > 0) {
+        const liqByTeacher = {};
+        liqRecords.forEach(r => {
+          if (!liqByTeacher[r.teacherId]) liqByTeacher[r.teacherId] = 0;
+          liqByTeacher[r.teacherId] += getRecordBalance(r);
+        });
+        let alertHtml = `<div class="section-title">⚠️ Alertas de liquidación</div>`;
+        Object.entries(liqByTeacher).forEach(([tid, amount]) => {
+          const teacher = teachers.find(t => t.id === tid);
+          if (teacher) {
+            alertHtml += `
+              <div class="alert-card animate-fade" onclick="showTeacherDetail('${tid}')">
+                <div class="alert-card-header">
+                  <div class="alert-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+                  <div class="alert-title">${escapeHtml(teacher.name)}</div>
+                </div>
+                <div class="alert-text">Tiene descuentos pendientes para descontar de la liquidación</div>
+                <div class="alert-amount">${formatCurrency(amount)}</div>
+              </div>`;
+          }
+        });
+        alertDiv.innerHTML = alertHtml;
       } else {
-        upcomingDiv.innerHTML = upcoming.map((u, i) => {
-          const d = new Date(u.date + 'T00:00:00');
-          return `
-            <div class="upcoming-item animate-fade stagger-${Math.min(i+1, 5)}" onclick="showLoanDetail('${u.loan.id}')">
-              <div class="upcoming-date">
-                <div class="upcoming-date-day">${d.getDate()}</div>
-                <div class="upcoming-date-month">${d.toLocaleDateString('es-CO', {month:'short'})}</div>
-              </div>
-              <div class="upcoming-content">
-                <div class="upcoming-title">${escapeHtml(u.teacher.name)}</div>
-                <div class="upcoming-desc">Cuota ${u.installmentNumber}/${u.totalInstallments} · ${u.days === 0 ? 'Este mes' : u.days > 0 ? 'En ' + u.days + ' días' : 'Ya pasó ' + Math.abs(u.days) + ' días'}</div>
-              </div>
-              <div class="upcoming-amount">${formatCurrency(u.amount)}</div>
-            </div>`;
-        }).join('');
+        alertDiv.innerHTML = '';
       }
       
       const list = $('teachersList');
@@ -599,27 +599,75 @@
           <div class="empty-state animate-fade">
             <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
             <div class="empty-title">No hay docentes</div>
-            <div class="empty-text">Agrega docentes para comenzar a registrar adelantos, meriendas y descuentos de nómina.</div>
+            <div class="empty-text">Agrega docentes para comenzar a registrar préstamos y descuentos.</div>
           </div>`;
         return;
       }
       list.innerHTML = teachers.map((t, i) => {
-        const balance = getTeacherBalance(t.id);
-        const totalLoanedT = getTeacherTotalLoaned(t.id);
+        const prestamoBal = getTeacherPrestamoBalance(t.id);
+        const descuentoBal = getTeacherDescuentoBalance(t.id);
+        const liqBal = getTeacherLiquidationBalance(t.id);
+        const totalBal = prestamoBal + descuentoBal + liqBal;
         const initials = (t.name || '').split(' ').map(w => w[0]).join('').substr(0, 2).toUpperCase();
         return `
           <div class="list-item animate-fade stagger-${Math.min(i+1, 5)}" onclick="showTeacherDetail('${t.id}')">
             <div class="list-avatar">${escapeHtml(initials)}</div>
             <div class="list-content">
               <div class="list-title">${escapeHtml(t.name)}</div>
-              <div class="list-subtitle">Total adeudado: ${formatCurrency(totalLoanedT)}</div>
+              <div class="list-subtitle">${prestamoBal > 0 ? 'Préstamo: ' + formatCurrency(prestamoBal) : ''}${descuentoBal > 0 ? ' · Descuento: ' + formatCurrency(descuentoBal) : ''}${liqBal > 0 ? ' · Liq: ' + formatCurrency(liqBal) : ''}</div>
             </div>
             <div class="list-meta">
-              <div class="list-amount ${balance > 0 ? 'negative' : 'positive'}">${formatCurrency(balance)}</div>
-              <div class="list-badge ${balance > 0 ? 'badge-warning' : 'badge-success'}">${balance > 0 ? 'Por descontar' : 'Al día'}</div>
+              <div class="list-amount ${totalBal > 0 ? 'negative' : 'positive'}">${formatCurrency(totalBal)}</div>
+              <div class="list-badge ${totalBal > 0 ? 'badge-warning' : 'badge-success'}">${totalBal > 0 ? 'Pendiente' : 'Al día'}</div>
             </div>
           </div>`;
       }).join('');
+    }
+    
+    // ===== LIQUIDATION SCREEN =====
+    function renderLiquidation() {
+      const records = getLiquidationRecords();
+      const teachers = getTeachers();
+      const content = $('liquidationContent');
+      if (records.length === 0) {
+        content.innerHTML = `
+          <div class="empty-state animate-fade">
+            <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+            <div class="empty-title">Sin descuentos de liquidación</div>
+            <div class="empty-text">No hay descuentos marcados para descontar de la liquidación final.</div>
+          </div>`;
+        return;
+      }
+      const byTeacher = {};
+      records.forEach(r => {
+        if (!byTeacher[r.teacherId]) byTeacher[r.teacherId] = [];
+        byTeacher[r.teacherId].push(r);
+      });
+      let html = `<div class="section-title">Descuentos de liquidación</div>`;
+      Object.entries(byTeacher).forEach(([tid, recs]) => {
+        const teacher = teachers.find(t => t.id === tid);
+        if (!teacher) return;
+        const total = recs.reduce((s, r) => s + getRecordBalance(r), 0);
+        html += `
+          <div class="dashboard-card animate-fade">
+            <div class="dashboard-card-header">
+              <div>
+                <div class="dashboard-card-title">${escapeHtml(teacher.name)}</div>
+                <div class="dashboard-card-subtitle">${teacher.role || 'Docente'}</div>
+              </div>
+              <div class="list-amount negative">${formatCurrency(total)}</div>
+            </div>`;
+        recs.forEach(r => {
+          const bal = getRecordBalance(r);
+          html += `
+            <div class="condition-row" onclick="showRecordDetail('${r.id}')" style="cursor:pointer;">
+              <span class="condition-label">${escapeHtml(r.concept || 'Sin concepto')}</span>
+              <span class="condition-value">${formatCurrency(bal)} / ${formatCurrency(r.amount)}</span>
+            </div>`;
+        });
+        html += `</div>`;
+      });
+      content.innerHTML = html;
     }
     
     // ===== MONTH PAYROLL SHEET =====
@@ -662,25 +710,28 @@
     
     // ===== TEACHER DETAIL =====
     let currentTeacherId = null;
-    let currentLoanId = null;
-    let teacherDetailTab = 'loans';
+    let currentRecordId = null;
+    let teacherDetailTab = 'descuentos';
     function showTeacherDetail(id) {
       currentTeacherId = id;
-      teacherDetailTab = 'loans';
+      teacherDetailTab = 'descuentos';
       renderTeacherDetail();
       showScreen('screenTeacher');
+      setNavActive('navDashboard');
     }
     function renderTeacherDetail() {
       const teacher = getTeachers().find(t => t.id === currentTeacherId);
       if (!teacher) return showScreen('screenDashboard');
-      const balance = getTeacherBalance(teacher.id);
-      const totalLoaned = getTeacherTotalLoaned(teacher.id);
+      const prestamoBal = getTeacherPrestamoBalance(teacher.id);
+      const descuentoBal = getTeacherDescuentoBalance(teacher.id);
+      const liqBal = getTeacherLiquidationBalance(teacher.id);
       const totalPaid = getTeacherTotalPaid(teacher.id);
-      const availableSalary = getAvailableSalary(teacher);
       const initials = (teacher.name || '').split(' ').map(w => w[0]).join('').substr(0, 2).toUpperCase();
-      const loans = getLoans().filter(l => l.teacherId === teacher.id).sort((a, b) => new Date(b.date) - new Date(a.date));
-      const allLoanIds = loans.map(l => l.id);
-      const allPayments = getPayments().filter(p => allLoanIds.includes(p.loanId)).sort((a, b) => new Date(b.date) - new Date(a.date));
+      const allRecords = getRecords().filter(r => r.teacherId === teacher.id).sort((a, b) => new Date(b.date) - new Date(a.date));
+      const descuentos = allRecords.filter(r => r.type === 'descuento');
+      const prestamos = allRecords.filter(r => r.type === 'prestamo');
+      const allRecordIds = allRecords.map(r => r.id);
+      const allPayments = getPayments().filter(p => allRecordIds.includes(p.recordId)).sort((a, b) => new Date(b.date) - new Date(a.date));
       
       // Month payroll for this teacher
       const now = new Date();
@@ -692,7 +743,7 @@
           <div class="detail-avatar">${escapeHtml(initials)}</div>
           <div class="detail-name">${escapeHtml(teacher.name)}</div>
           <div class="detail-role">${escapeHtml(teacher.role || 'Docente')}</div>
-          <div class="detail-salary">Salario: <strong>${formatCurrency(teacher.salary)}</strong> · Disponible: <strong style="color:${availableSalary >= 0 ? 'var(--success)' : 'var(--danger)'}">${formatCurrency(availableSalary)}</strong></div>
+          <div class="detail-salary">Salario: <strong>${formatCurrency(teacher.salary)}</strong></div>
         </div>`;
       
       // This month payroll card
@@ -701,7 +752,7 @@
           <div class="payroll-title">${monthName} — Resumen de nómina</div>
           <div class="payroll-row"><span class="payroll-label">Salario bruto</span><span class="payroll-value">${formatCurrency(teacher.salary)}</span></div>
           <div class="payroll-row"><span class="payroll-label">Descuentos este mes</span><span class="payroll-value deduction">-${formatCurrency(monthDed.total)}</span></div>
-          ${monthDed.details.length > 0 ? `<div style="font-size:12px;color:var(--text-muted);margin:4px 0 8px;padding-left:8px;">${monthDed.details.map(d => `• Cuota ${d.installmentNumber} de ${(LOAN_TYPES[d.loan.type]||LOAN_TYPES.other).label.toLowerCase()}: ${formatCurrency(d.amount)}`).join('<br>')}</div>` : ''}
+          ${monthDed.details.length > 0 ? `<div style="font-size:12px;color:var(--text-muted);margin:4px 0 8px;padding-left:8px;">${monthDed.details.map(d => `• Cuota ${d.installmentNumber} de ${escapeHtml(d.record.concept || 'descuento')}: ${formatCurrency(d.amount)}`).join('<br>')}</div>` : ''}
           <div class="payroll-total"><span class="payroll-label" style="font-size:15px;">A pagar este mes</span><span class="payroll-value net">${formatCurrency((teacher.salary || 0) - monthDed.total)}</span></div>
         </div>
         
@@ -713,53 +764,39 @@
         </div>
         
         <div class="detail-stats animate-fade stagger-2">
-          <div class="detail-stat"><div class="detail-stat-value" style="color:var(--accent-light)">${formatCurrency(totalLoaned)}</div><div class="detail-stat-label">Total Adeudado</div></div>
-          <div class="detail-stat"><div class="detail-stat-value" style="color:var(--success)">${formatCurrency(totalPaid)}</div><div class="detail-stat-label">Ya Descontado</div></div>
-          <div class="detail-stat"><div class="detail-stat-value" style="color:${balance > 0 ? 'var(--danger)' : 'var(--success)'}">${formatCurrency(balance)}</div><div class="detail-stat-label">Por Descontar</div></div>
+          <div class="detail-stat"><div class="detail-stat-value" style="color:var(--info)">${formatCurrency(prestamoBal)}</div><div class="detail-stat-label">Préstamos</div></div>
+          <div class="detail-stat"><div class="detail-stat-value" style="color:var(--warning)">${formatCurrency(descuentoBal)}</div><div class="detail-stat-label">Descuentos</div></div>
+          <div class="detail-stat"><div class="detail-stat-value" style="color:${liqBal > 0 ? 'var(--danger)' : 'var(--success)'}">${formatCurrency(liqBal)}</div><div class="detail-stat-label">Liquidación</div></div>
         </div>
         <div class="tabs animate-fade stagger-3">
-          <button class="tab ${teacherDetailTab === 'loans' ? 'active' : ''}" onclick="teacherDetailTab='loans';renderTeacherDetail();">Registros</button>
+          <button class="tab ${teacherDetailTab === 'descuentos' ? 'active' : ''}" onclick="teacherDetailTab='descuentos';renderTeacherDetail();">Descuentos</button>
+          <button class="tab ${teacherDetailTab === 'prestamos' ? 'active' : ''}" onclick="teacherDetailTab='prestamos';renderTeacherDetail();">Préstamos</button>
           <button class="tab ${teacherDetailTab === 'history' ? 'active' : ''}" onclick="teacherDetailTab='history';renderTeacherDetail();">Historial</button>
         </div>
         <div class="content" style="padding-top:8px;">`;
       
-      if (teacherDetailTab === 'loans') {
-        if (loans.length === 0) {
+      if (teacherDetailTab === 'descuentos') {
+        const items = descuentos.filter(r => !r.deductFromLiquidation);
+        if (items.length === 0) {
           content += `
             <div class="empty-state animate-fade">
               <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
-              <div class="empty-title">Sin registros</div>
-              <div class="empty-text">Este docente no tiene adelantos ni consumos registrados.</div>
+              <div class="empty-title">Sin descuentos</div>
+              <div class="empty-text">Este docente no tiene descuentos de nómina activos.</div>
             </div>`;
         } else {
-          content += loans.map((l, i) => {
-            const bal = getLoanBalance(l);
-            const pct = l.amount > 0 ? ((l.amount - bal) / l.amount * 100) : 0;
-            const status = bal <= 0 ? 'paid' : 'active';
-            const typeInfo = LOAN_TYPES[l.type] || LOAN_TYPES.other;
-            const instStatus = getInstallmentStatus(l);
-            return `
-              <div class="loan-card animate-fade stagger-${Math.min(i+1, 5)}" onclick="showLoanDetail('${l.id}')">
-                <div class="loan-card-header">
-                  <div>
-                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                      <span class="type-badge ${typeInfo.class}">${typeInfo.icon} ${typeInfo.label}</span>
-                      ${l.description ? `<span style="font-size:12px;color:var(--text-muted);">${escapeHtml(l.description)}</span>` : ''}
-                    </div>
-                    <div class="loan-card-date">${formatDate(l.date)}</div>
-                  </div>
-                  <div class="list-badge ${status === 'paid' ? 'badge-success' : 'badge-warning'}">${status === 'paid' ? 'Completado' : 'Activo'}</div>
-                </div>
-                <div class="loan-card-amount currency">${formatCurrency(l.amount)}</div>
-                <div class="loan-card-balance">${bal > 0 ? 'Por descontar: ' + formatCurrency(bal) : 'Totalmente descontado'}</div>
-                ${l.installments > 0 ? `<div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">Cuotas: ${instStatus.paidCount}/${l.installments} descontadas · ${formatCurrency(l.installmentAmount || 0)} c/u</div>` : ''}
-                ${bal > 0 ? `<div class="progress-bar"><div class="progress-fill ${pct > 75 ? 'success' : pct > 40 ? 'warning' : 'danger'}" style="width:${pct}%"></div></div>` : ''}
-                <div class="loan-card-actions" style="margin-top:14px;">
-                  <button class="btn btn-success btn-sm" onclick="event.stopPropagation();openSheetAddPayment('${l.id}')">Abono libre</button>
-                  <button class="btn btn-info btn-sm" onclick="event.stopPropagation();registerInstallmentPayment('${l.id}')">Descontar cuota</button>
-                </div>
-              </div>`;
-          }).join('');
+          content += items.map((r, i) => renderRecordCard(r, i)).join('');
+        }
+      } else if (teacherDetailTab === 'prestamos') {
+        if (prestamos.length === 0) {
+          content += `
+            <div class="empty-state animate-fade">
+              <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+              <div class="empty-title">Sin préstamos</div>
+              <div class="empty-text">Este docente no tiene préstamos registrados.</div>
+            </div>`;
+        } else {
+          content += prestamos.map((r, i) => renderRecordCard(r, i)).join('');
         }
       } else {
         if (allPayments.length === 0) {
@@ -767,21 +804,21 @@
             <div class="empty-state animate-fade">
               <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
               <div class="empty-title">Sin movimientos</div>
-              <div class="empty-text">No hay descuentos ni abonos registrados.</div>
+              <div class="empty-text">No hay abonos ni descuentos registrados.</div>
             </div>`;
         } else {
           content += allPayments.map((p, i) => {
-            const loan = loans.find(l => l.id === p.loanId);
+            const record = allRecords.find(r => r.id === p.recordId);
             return `
               <div class="timeline-item animate-fade stagger-${Math.min(i+1, 5)}">
-                <div class="timeline-dot ${p.type === 'installment' ? 'installment' : p.type === 'salary' ? 'salary' : 'payment'}">
+                <div class="timeline-dot ${p.type === 'installment' ? 'installment' : p.type === 'liquidation' ? 'liquidation' : 'payment'}">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    ${p.type === 'installment' ? '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>' : p.type === 'salary' ? '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>' : '<polyline points="20 6 9 17 4 12"/>'}
+                    ${p.type === 'installment' ? '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>' : p.type === 'liquidation' ? '<path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>' : '<polyline points="20 6 9 17 4 12"/>'}
                   </svg>
                 </div>
                 <div class="timeline-content">
-                  <div class="timeline-title">${p.type === 'installment' ? 'Descuento de cuota #' + (p.installmentNumber || '') : p.type === 'salary' ? 'Descuento de salario' : 'Abono libre'}</div>
-                  <div class="timeline-desc">${loan ? (LOAN_TYPES[loan.type] || LOAN_TYPES.other).label + ' del ' + formatDate(loan.date) : ''}</div>
+                  <div class="timeline-title">${p.type === 'installment' ? 'Descuento cuota #' + (p.installmentNumber || '') : p.type === 'liquidation' ? 'Descuento de liquidación' : 'Abono'}</div>
+                  <div class="timeline-desc">${record ? (RECORD_TYPES[record.type] || RECORD_TYPES.descuento).label + ': ' + escapeHtml(record.concept || '') : ''}</div>
                   <div class="timeline-date">${formatDate(p.date)}${p.notes ? ' · ' + escapeHtml(p.notes) : ''}</div>
                 </div>
                 <div class="timeline-amount positive">${formatCurrency(p.amount)}</div>
@@ -793,14 +830,45 @@
       $('teacherDetailContent').innerHTML = content;
     }
     
+    function renderRecordCard(r, i) {
+      const bal = getRecordBalance(r);
+      const pct = r.amount > 0 ? ((r.amount - bal) / r.amount * 100) : 0;
+      const status = bal <= 0 ? 'paid' : 'active';
+      const typeInfo = RECORD_TYPES[r.type] || RECORD_TYPES.descuento;
+      const instStatus = r.type === 'descuento' && r.installments > 0 ? getInstallmentStatus(r) : null;
+      return `
+        <div class="loan-card animate-fade stagger-${Math.min(i+1, 5)}" onclick="showRecordDetail('${r.id}')">
+          <div class="loan-card-header">
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                <span class="type-badge ${typeInfo.class}">${typeInfo.icon} ${typeInfo.label}</span>
+                ${r.deductFromLiquidation ? '<span class="badge-liquidation">Liquidación</span>' : ''}
+              </div>
+              <div style="font-size:14px;font-weight:500;margin-bottom:2px;">${escapeHtml(r.concept || '')}</div>
+              <div class="loan-card-date">${formatDate(r.date)}</div>
+            </div>
+            <div class="list-badge ${status === 'paid' ? 'badge-success' : 'badge-warning'}">${status === 'paid' ? 'Completado' : 'Activo'}</div>
+          </div>
+          <div class="loan-card-amount currency">${formatCurrency(r.amount)}</div>
+          <div class="loan-card-balance">${bal > 0 ? 'Por descontar: ' + formatCurrency(bal) : 'Totalmente descontado'}</div>
+          ${instStatus && r.installments > 0 ? `<div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">Cuotas: ${instStatus.paidCount}/${r.installments} descontadas · ${formatCurrency(r.installmentAmount || 0)} c/u</div>` : ''}
+          ${bal > 0 ? `<div class="progress-bar"><div class="progress-fill ${pct > 75 ? 'success' : pct > 40 ? 'warning' : 'danger'}" style="width:${pct}%"></div></div>` : ''}
+          <div class="loan-card-actions" style="margin-top:14px;">
+            ${r.type === 'descuento' && r.installments > 0 && !r.deductFromLiquidation ? `<button class="btn btn-info btn-sm" onclick="event.stopPropagation();registerInstallmentPayment('${r.id}')">Descontar cuota</button>` : ''}
+            ${r.type === 'descuento' && r.deductFromLiquidation ? `<button class="btn btn-danger btn-sm" onclick="event.stopPropagation();registerLiquidationPayment('${r.id}')">Descontar liquidación</button>` : ''}
+            <button class="btn btn-success btn-sm" onclick="event.stopPropagation();openSheetAddPayment('${r.id}')">Abono</button>
+          </div>
+        </div>`;
+    }
+    
     // ===== COPY TEACHER SUMMARY =====
     function copyTeacherSummary(teacherId) {
       const teacher = getTeachers().find(t => t.id === teacherId);
       if (!teacher) return;
       const now = new Date();
       const monthDed = getMonthDeductions(teacherId, now.getFullYear(), now.getMonth());
-      const loans = getLoans().filter(l => l.teacherId === teacherId).sort((a, b) => new Date(b.date) - new Date(a.date));
-      const allPayments = getPayments().filter(p => loans.some(l => l.id === p.loanId)).sort((a, b) => new Date(b.date) - new Date(a.date));
+      const records = getRecords().filter(r => r.teacherId === teacherId).sort((a, b) => new Date(b.date) - new Date(a.date));
+      const allPayments = getPayments().filter(p => records.some(r => r.id === p.recordId)).sort((a, b) => new Date(b.date) - new Date(a.date));
       
       let text = `📋 RESUMEN DE NÓMINA — ${teacher.name.toUpperCase()}\n`;
       text += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
@@ -808,30 +876,30 @@
       text += `➖ Descuentos ${now.toLocaleDateString('es-CO', {month:'long'})}: ${formatCurrency(monthDed.total)}\n`;
       if (monthDed.details.length > 0) {
         monthDed.details.forEach(d => {
-          text += `   • Cuota ${d.installmentNumber} de ${(LOAN_TYPES[d.loan.type]||LOAN_TYPES.other).label}: ${formatCurrency(d.amount)}\n`;
+          text += `   • Cuota ${d.installmentNumber} de ${d.record.concept || 'descuento'}: ${formatCurrency(d.amount)}\n`;
         });
       }
       text += `✅ A pagar este mes: ${formatCurrency((teacher.salary || 0) - monthDed.total)}\n\n`;
       
       text += `📊 HISTORIAL COMPLETO\n`;
       text += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-      if (loans.length === 0) {
+      if (records.length === 0) {
         text += `No hay registros.\n`;
       } else {
-        loans.forEach(l => {
-          const typeInfo = LOAN_TYPES[l.type] || LOAN_TYPES.other;
-          const bal = getLoanBalance(l);
-          const paid = (l.amount || 0) - bal;
-          text += `\n${typeInfo.icon} ${typeInfo.label}\n`;
-          text += `   Fecha: ${formatDate(l.date)}\n`;
-          text += `   Monto total: ${formatCurrency(l.amount)}\n`;
+        records.forEach(r => {
+          const typeInfo = RECORD_TYPES[r.type] || RECORD_TYPES.descuento;
+          const bal = getRecordBalance(r);
+          const paid = (r.amount || 0) - bal;
+          text += `\n${typeInfo.icon} ${typeInfo.label}${r.deductFromLiquidation ? ' (Liquidación)' : ''}\n`;
+          text += `   Concepto: ${r.concept || 'N/A'}\n`;
+          text += `   Fecha: ${formatDate(r.date)}\n`;
+          text += `   Monto total: ${formatCurrency(r.amount)}\n`;
           text += `   Descontado: ${formatCurrency(paid)}\n`;
           text += `   Por descontar: ${formatCurrency(bal)}\n`;
-          if (l.installments > 0) {
-            text += `   Cuotas: ${l.installments} de ${formatCurrency(l.installmentAmount || 0)} c/u\n`;
-            text += `   Desde: ${formatDate(l.startDate)} hasta ${formatDate(l.endDate)}\n`;
+          if (r.installments > 0) {
+            text += `   Cuotas: ${r.installments} de ${formatCurrency(r.installmentAmount || 0)} c/u\n`;
+            text += `   Desde: ${formatDate(r.startDate)} hasta ${formatDate(r.endDate)}\n`;
           }
-          if (l.description) text += `   Detalle: ${l.description}\n`;
         });
       }
       
@@ -841,80 +909,82 @@
         text += `Aún no se han realizado descuentos.\n`;
       } else {
         allPayments.forEach(p => {
-          const loan = loans.find(l => l.id === p.loanId);
-          const label = p.type === 'installment' ? `Cuota #${p.installmentNumber}` : p.type === 'salary' ? 'Descuento salario' : 'Abono libre';
+          const record = records.find(r => r.id === p.recordId);
+          const label = p.type === 'installment' ? `Cuota #${p.installmentNumber}` : p.type === 'liquidation' ? 'Liquidación' : 'Abono';
           text += `• ${formatDate(p.date)} — ${label}: ${formatCurrency(p.amount)}\n`;
         });
       }
       
-      text += `\n💡 Total adeudado: ${formatCurrency(getTeacherBalance(teacherId))}\n`;
+      text += `\n💡 Total adeudado: ${formatCurrency(getTeacherPrestamoBalance(teacherId) + getTeacherDescuentoBalance(teacherId) + getTeacherLiquidationBalance(teacherId))}\n`;
+      const liqBal = getTeacherLiquidationBalance(teacherId);
+      if (liqBal > 0) {
+        text += `⚠️ Total para liquidación: ${formatCurrency(liqBal)}\n`;
+      }
       text += `Generado el ${now.toLocaleDateString('es-CO')}`;
       
       copyToClipboard(text);
     }
     
-    // ===== LOAN DETAIL =====
-    function showLoanDetail(loanId) {
-      currentLoanId = loanId;
-      renderLoanDetail();
-      showScreen('screenLoan');
+    // ===== RECORD DETAIL =====
+    function showRecordDetail(recordId) {
+      currentRecordId = recordId;
+      renderRecordDetail();
+      showScreen('screenRecord');
     }
-    function goBackFromLoan() {
-      const loan = getLoans().find(l => l.id === currentLoanId);
-      if (loan) showTeacherDetail(loan.teacherId);
+    function goBackFromRecord() {
+      const record = getRecords().find(r => r.id === currentRecordId);
+      if (record) showTeacherDetail(record.teacherId);
       else showScreen('screenDashboard');
     }
-    function renderLoanDetail() {
-      const loan = getLoans().find(l => l.id === currentLoanId);
-      if (!loan) return goBackFromLoan();
-      const teacher = getTeachers().find(t => t.id === loan.teacherId);
-      const payments = getLoanPayments(loan.id);
-      const balance = getLoanBalance(loan);
-      const pct = loan.amount > 0 ? ((loan.amount - balance) / loan.amount * 100) : 0;
-      const typeInfo = LOAN_TYPES[loan.type] || LOAN_TYPES.other;
-      const instStatus = getInstallmentStatus(loan);
+    function renderRecordDetail() {
+      const record = getRecords().find(r => r.id === currentRecordId);
+      if (!record) return goBackFromRecord();
+      const teacher = getTeachers().find(t => t.id === record.teacherId);
+      const payments = getRecordPayments(record.id);
+      const balance = getRecordBalance(record);
+      const pct = record.amount > 0 ? ((record.amount - balance) / record.amount * 100) : 0;
+      const typeInfo = RECORD_TYPES[record.type] || RECORD_TYPES.descuento;
+      const instStatus = record.type === 'descuento' && record.installments > 0 ? getInstallmentStatus(record) : null;
       
       let content = `
         <div class="detail-header animate-fade">
-          <div style="margin-bottom:12px;"><span class="type-badge ${typeInfo.class}">${typeInfo.icon} ${typeInfo.label}</span></div>
+          <div style="margin-bottom:12px;"><span class="type-badge ${typeInfo.class}">${typeInfo.icon} ${typeInfo.label}</span>${record.deductFromLiquidation ? ' <span class="badge-liquidation">Liquidación</span>' : ''}</div>
           <div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;">${teacher ? escapeHtml(teacher.name) : ''}</div>
-          <div class="detail-name">${loan.description ? escapeHtml(loan.description) : typeInfo.label}</div>
-          <div class="detail-role">${formatDate(loan.date)}</div>
-          <div class="detail-salary">Monto: <strong>${formatCurrency(loan.amount)}</strong> · Por descontar: <strong style="color:${balance > 0 ? 'var(--danger)' : 'var(--success)'}">${formatCurrency(balance)}</strong></div>
+          <div class="detail-name">${escapeHtml(record.concept || typeInfo.label)}</div>
+          <div class="detail-role">${formatDate(record.date)}</div>
+          <div class="detail-salary">Monto: <strong>${formatCurrency(record.amount)}</strong> · Por descontar: <strong style="color:${balance > 0 ? 'var(--danger)' : 'var(--success)'}">${formatCurrency(balance)}</strong></div>
         </div>`;
       
-      if (loan.installments > 0) {
+      if (record.type === 'descuento' && record.installments > 0) {
         content += `
           <div class="dashboard-card animate-fade stagger-1" style="margin:16px 20px;">
             <div class="dashboard-card-header">
               <div>
                 <div class="dashboard-card-title">Plan de descuentos</div>
-                <div class="dashboard-card-subtitle">Descuentos pactados de nómina</div>
+                <div class="dashboard-card-subtitle">${record.deductFromLiquidation ? 'Descontar de liquidación final' : 'Descuentos de nómina'}</div>
               </div>
             </div>
-            <div class="condition-row"><span class="condition-label">Inicio descuento</span><span class="condition-value">${formatDate(loan.startDate)}</span></div>
-            <div class="condition-row"><span class="condition-label">Fin descuento</span><span class="condition-value">${formatDate(loan.endDate)}</span></div>
-            <div class="condition-row"><span class="condition-label">Número de cuotas</span><span class="condition-value">${loan.installments}</span></div>
-            <div class="condition-row"><span class="condition-label">Monto por cuota</span><span class="condition-value">${formatCurrency(loan.installmentAmount)}</span></div>
-            <div class="condition-row"><span class="condition-label">Día de descuento</span><span class="condition-value">${loan.installmentDay || 'No definido'}</span></div>
+            <div class="condition-row"><span class="condition-label">Inicio descuento</span><span class="condition-value">${formatDate(record.startDate)}</span></div>
+            <div class="condition-row"><span class="condition-label">Fin descuento</span><span class="condition-value">${formatDate(record.endDate)}</span></div>
+            <div class="condition-row"><span class="condition-label">Número de cuotas</span><span class="condition-value">${record.installments}</span></div>
+            <div class="condition-row"><span class="condition-label">Monto por cuota</span><span class="condition-value">${formatCurrency(record.installmentAmount)}</span></div>
+            <div class="condition-row"><span class="condition-label">Día de descuento</span><span class="condition-value">${record.installmentDay || 'No definido'}</span></div>
           </div>`;
         
-        content += `
-          <div class="animate-fade stagger-2" style="padding:0 20px;">
-            <div class="installment-summary">
-              <div class="installment-summary-item"><div class="installment-summary-value" style="color:var(--success)">${instStatus.paidCount}</div><div class="installment-summary-label">Descontadas</div></div>
-              <div class="installment-summary-item"><div class="installment-summary-value" style="color:var(--warning)">${instStatus.remaining}</div><div class="installment-summary-label">Por descontar</div></div>
-              <div class="installment-summary-item"><div class="installment-summary-value" style="color:var(--accent-light)">${instStatus.nextIndex >= 0 ? instStatus.nextIndex + 1 : '-'}</div><div class="installment-summary-label">Próxima</div></div>
-            </div>
-            <div class="progress-bar" style="height:8px;"><div class="progress-fill ${pct > 75 ? 'success' : pct > 40 ? 'warning' : 'danger'}" style="width:${pct}%"></div></div>
-            <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:var(--text-muted);">
-              <span>${pct.toFixed(0)}% descontado</span>
-              <span>${formatCurrency(loan.amount - balance)} de ${formatCurrency(loan.amount)}</span>
-            </div>
-          </div>`;
-        
-        if (instStatus.dates.length > 0) {
+        if (instStatus && instStatus.dates.length > 0) {
           content += `
+            <div class="animate-fade stagger-2" style="padding:0 20px;">
+              <div class="installment-summary">
+                <div class="installment-summary-item"><div class="installment-summary-value" style="color:var(--success)">${instStatus.paidCount}</div><div class="installment-summary-label">Descontadas</div></div>
+                <div class="installment-summary-item"><div class="installment-summary-value" style="color:var(--warning)">${instStatus.remaining}</div><div class="installment-summary-label">Por descontar</div></div>
+                <div class="installment-summary-item"><div class="installment-summary-value" style="color:var(--accent-light)">${instStatus.nextIndex >= 0 ? instStatus.nextIndex + 1 : '-'}</div><div class="installment-summary-label">Próxima</div></div>
+              </div>
+              <div class="progress-bar" style="height:8px;"><div class="progress-fill ${pct > 75 ? 'success' : pct > 40 ? 'warning' : 'danger'}" style="width:${pct}%"></div></div>
+              <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:var(--text-muted);">
+                <span>${pct.toFixed(0)}% descontado</span>
+                <span>${formatCurrency(record.amount - balance)} de ${formatCurrency(record.amount)}</span>
+              </div>
+            </div>
             <div class="animate-fade stagger-3" style="padding:0 20px;margin-top:20px;">
               <div class="section-title" style="margin-top:0;">Calendario de descuentos</div>
               <div class="installment-grid">`;
@@ -925,19 +995,20 @@
             content += `<div class="installment-cell ${isPaid ? 'paid' : 'pending'} ${isNext ? 'next' : ''}" title="${formatDate(date)}">${d.getDate()}</div>`;
           });
           content += `</div>
-            <div class="installment-legend">
-              <div class="installment-legend-item"><div class="installment-legend-dot" style="background:rgba(52,211,153,0.3);"></div>Descontada</div>
-              <div class="installment-legend-item"><div class="installment-legend-dot" style="background:rgba(255,255,255,0.05);border:1px solid var(--border-glass);"></div>Por descontar</div>
-              <div class="installment-legend-item"><div class="installment-legend-dot" style="box-shadow:0 0 0 2px var(--accent);background:transparent;"></div>Próxima</div>
-            </div>
-          </div>`;
+              <div class="installment-legend">
+                <div class="installment-legend-item"><div class="installment-legend-dot" style="background:rgba(52,211,153,0.3);"></div>Descontada</div>
+                <div class="installment-legend-item"><div class="installment-legend-dot" style="background:rgba(255,255,255,0.05);border:1px solid var(--border-glass);"></div>Por descontar</div>
+                <div class="installment-legend-item"><div class="installment-legend-dot" style="box-shadow:0 0 0 2px var(--accent);background:transparent;"></div>Próxima</div>
+              </div>
+            </div>`;
         }
       }
       
       content += `
         <div class="action-row animate-fade stagger-4">
-          <button class="btn btn-success" onclick="openSheetAddPayment('${loan.id}')">Abono libre</button>
-          ${loan.installments > 0 ? `<button class="btn btn-info" onclick="registerInstallmentPayment('${loan.id}')">Descontar cuota</button>` : `<button class="btn btn-secondary" onclick="openSheetAddPayment('${loan.id}', true)">Descontar salario</button>`}
+          ${record.type === 'descuento' && record.installments > 0 && !record.deductFromLiquidation ? `<button class="btn btn-info" onclick="registerInstallmentPayment('${record.id}')">Descontar cuota</button>` : ''}
+          ${record.type === 'descuento' && record.deductFromLiquidation ? `<button class="btn btn-danger" onclick="registerLiquidationPayment('${record.id}')">Descontar liquidación</button>` : ''}
+          <button class="btn btn-success" onclick="openSheetAddPayment('${record.id}')">Abono libre</button>
         </div>
         <div class="section-title" style="padding:0 20px;">Historial de descuentos</div>
         <div class="content" style="padding-top:0;">`;
@@ -952,13 +1023,13 @@
       } else {
         content += payments.map((p, i) => `
           <div class="timeline-item animate-fade stagger-${Math.min(i+1, 5)}">
-            <div class="timeline-dot ${p.type === 'installment' ? 'installment' : p.type === 'salary' ? 'salary' : 'payment'}">
+            <div class="timeline-dot ${p.type === 'installment' ? 'installment' : p.type === 'liquidation' ? 'liquidation' : 'payment'}">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                ${p.type === 'installment' ? '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>' : p.type === 'salary' ? '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>' : '<polyline points="20 6 9 17 4 12"/>'}
+                ${p.type === 'installment' ? '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>' : p.type === 'liquidation' ? '<path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>' : '<polyline points="20 6 9 17 4 12"/>'}
               </svg>
             </div>
             <div class="timeline-content">
-              <div class="timeline-title">${p.type === 'installment' ? 'Descuento de cuota #' + (p.installmentNumber || '') : p.type === 'salary' ? 'Descuento de salario' : 'Abono libre'}</div>
+              <div class="timeline-title">${p.type === 'installment' ? 'Descuento cuota #' + (p.installmentNumber || '') : p.type === 'liquidation' ? 'Descuento de liquidación' : 'Abono libre'}</div>
               <div class="timeline-date">${formatDate(p.date)}${p.notes ? ' · ' + escapeHtml(p.notes) : ''}</div>
             </div>
             <div class="timeline-amount positive">${formatCurrency(p.amount)}</div>
@@ -966,7 +1037,7 @@
         `).join('');
       }
       content += `</div>`;
-      $('loanDetailContent').innerHTML = content;
+      $('recordDetailContent').innerHTML = content;
     }
     
     // ===== SHEETS: ADD TEACHER =====
@@ -995,8 +1066,8 @@
       renderDashboard();
     }
     
-    // ===== SHEETS: ADD LOAN =====
-    let selectedLoanType = 'advance';
+    // ===== SHEETS: ADD RECORD =====
+    let selectedRecordType = 'prestamo';
     function openSheetAddLoan() {
       const teachers = getTeachers();
       if (teachers.length === 0) {
@@ -1012,125 +1083,151 @@
         return;
       }
       const options = teachers.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
-      selectedLoanType = 'advance';
+      selectedRecordType = 'prestamo';
       openSheet(`
         <div class="sheet-title">Nuevo Registro</div>
-        <form onsubmit="event.preventDefault(); saveLoan();">
+        <form onsubmit="event.preventDefault(); saveRecord();">
           <div class="input-group"><label>Tipo</label>
             <div class="radio-group">
-              <div class="radio-option selected" onclick="selectLoanType(this, 'advance')" data-type="advance"><div class="radio-icon">💰</div><div class="radio-label">Adelanto</div><div class="radio-sublabel">De salario</div></div>
-              <div class="radio-option" onclick="selectLoanType(this, 'cafeteria')" data-type="cafeteria"><div class="radio-icon">🍽️</div><div class="radio-label">Merienda</div><div class="radio-sublabel">Cafetería</div></div>
-              <div class="radio-option" onclick="selectLoanType(this, 'other')" data-type="other"><div class="radio-icon">📋</div><div class="radio-label">Otro</div><div class="radio-sublabel">Consumo/vario</div></div>
+              <div class="radio-option selected" onclick="selectRecordType(this, 'prestamo')" data-type="prestamo"><div class="radio-icon">💰</div><div class="radio-label">Préstamo</div><div class="radio-sublabel">Debe devolver</div></div>
+              <div class="radio-option" onclick="selectRecordType(this, 'descuento')" data-type="descuento"><div class="radio-icon">📋</div><div class="radio-label">Descuento</div><div class="radio-sublabel">De nómina</div></div>
             </div>
           </div>
-          <div class="input-group"><label>Docente</label><select class="input" id="lTeacher" required>${options}</select></div>
-          <div class="input-group" id="descGroup" style="display:none;"><label>Descripción (qué consumió)</label><input type="text" class="input" id="lDescription" placeholder="Ej: Almuerzo + jugo + galletas"></div>
-          <div class="input-group"><label>Monto</label><input type="number" class="input" id="lAmount" placeholder="Ej: 500000" min="1" step="1000" required></div>
-          <div class="input-group"><label>Fecha del registro</label><input type="date" class="input" id="lDate" required></div>
-          <div style="background:var(--bg-glass);border-radius:var(--radius-sm);padding:16px;margin-bottom:20px;border:1px solid var(--border-glass);">
-            <div style="font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.8px;">Plan de descuentos de nómina</div>
-            <div class="input-group"><label>Inicio descuento</label><input type="date" class="input" id="lStartDate"></div>
-            <div class="input-group"><label>Número de cuotas</label><input type="number" class="input" id="lInstallments" placeholder="Ej: 3" min="1" max="48" onchange="calculateInstallment()"></div>
-            <div class="input-group"><label>Día de descuento (del mes)</label><input type="number" class="input" id="lInstallmentDay" placeholder="Ej: 15" min="1" max="31" onchange="calculateInstallment()"></div>
-            <div style="display:flex;gap:10px;">
-              <div class="input-group" style="flex:1;"><label>Monto cuota</label><input type="number" class="input" id="lInstallmentAmount" placeholder="Calculado" min="1" step="1000" onchange="calculateInstallmentsFromAmount()"></div>
-              <div class="input-group" style="flex:1;"><label>Fin descuento</label><input type="date" class="input" id="lEndDate" readonly style="color:var(--text-muted);"></div>
+          <div class="input-group"><label>Docente</label><select class="input" id="rTeacher" required>${options}</select></div>
+          <div class="input-group" id="conceptGroup" style="display:none;"><label>Concepto</label><input type="text" class="input" id="rConcept" placeholder="Ej: Uniforme, material, multa..."></div>
+          <div class="input-group"><label>Monto</label><input type="number" class="input" id="rAmount" placeholder="Ej: 500000" min="1" step="1000" required></div>
+          <div class="input-group"><label>Fecha</label><input type="date" class="input" id="rDate" required></div>
+          <div id="descuentoOptions" style="display:none;">
+            <div style="background:var(--bg-glass);border-radius:var(--radius-sm);padding:16px;margin-bottom:20px;border:1px solid var(--border-glass);">
+              <div style="font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.8px;">Plan de descuentos</div>
+              <div class="input-group"><label>Inicio descuento</label><input type="date" class="input" id="rStartDate"></div>
+              <div class="input-group"><label>Número de cuotas</label><input type="number" class="input" id="rInstallments" placeholder="Ej: 3" min="1" max="48" onchange="calculateRecordInstallment()"></div>
+              <div class="input-group"><label>Día de descuento (del mes)</label><input type="number" class="input" id="rInstallmentDay" placeholder="Ej: 15" min="1" max="31" onchange="calculateRecordInstallment()"></div>
+              <div style="display:flex;gap:10px;">
+                <div class="input-group" style="flex:1;"><label>Monto cuota</label><input type="number" class="input" id="rInstallmentAmount" placeholder="Calculado" min="1" step="1000" onchange="calculateRecordInstallmentsFromAmount()"></div>
+                <div class="input-group" style="flex:1;"><label>Fin descuento</label><input type="date" class="input" id="rEndDate" readonly style="color:var(--text-muted);"></div>
+              </div>
+            </div>
+            <div class="checkbox-row" onclick="document.getElementById('rLiquidation').click();">
+              <input type="checkbox" id="rLiquidation" onchange="toggleLiquidation()">
+              <label for="rLiquidation">Descontar de la liquidación final</label>
+            </div>
+            <div id="liquidationWarning" style="display:none;background:rgba(220,38,38,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:var(--radius-sm);padding:12px;margin-bottom:16px;font-size:13px;color:var(--danger);">
+              ⚠️ Este descuento se descontará completamente de la liquidación final del docente.
             </div>
           </div>
-          <div class="input-group"><label>Notas adicionales</label><input type="text" class="input" id="lNotes" placeholder="Ej: Urgente, descontar antes de vacaciones"></div>
+          <div class="input-group"><label>Notas adicionales</label><input type="text" class="input" id="rNotes" placeholder="Ej: Urgente, descontar antes de vacaciones"></div>
           <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;">Guardar</button>
         </form>
       `);
-      $('lDate').valueAsDate = new Date();
-      setTimeout(() => $('lAmount').focus(), 350);
+      $('rDate').valueAsDate = new Date();
+      setTimeout(() => $('rAmount').focus(), 350);
     }
-    function selectLoanType(el, type) {
+    function selectRecordType(el, type) {
       document.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
       el.classList.add('selected');
-      selectedLoanType = type;
-      const descGroup = $('descGroup');
-      if (descGroup) descGroup.style.display = (type === 'cafeteria' || type === 'other') ? 'block' : 'none';
+      selectedRecordType = type;
+      const conceptGroup = $('conceptGroup');
+      const descuentoOptions = $('descuentoOptions');
+      if (conceptGroup) conceptGroup.style.display = type === 'descuento' ? 'block' : 'none';
+      if (descuentoOptions) descuentoOptions.style.display = type === 'descuento' ? 'block' : 'none';
     }
-    function calculateInstallment() {
-      const amount = parseMoney($('lAmount').value);
-      const installments = parseInt($('lInstallments').value) || 0;
-      const startDate = $('lStartDate').value;
-      const day = parseInt($('lInstallmentDay').value) || 15;
+    function toggleLiquidation() {
+      const warning = $('liquidationWarning');
+      const isChecked = $('rLiquidation').checked;
+      if (warning) warning.style.display = isChecked ? 'block' : 'none';
+    }
+    function calculateRecordInstallment() {
+      const amount = parseMoney($('rAmount').value);
+      const installments = parseInt($('rInstallments').value) || 0;
+      const startDate = $('rStartDate').value;
       if (amount > 0 && installments > 0) {
         const amt = Math.round(amount / installments);
-        $('lInstallmentAmount').value = amt;
+        $('rInstallmentAmount').value = amt;
       }
       if (startDate && installments > 0) {
         const end = addMonths(startDate, installments - 1);
-        $('lEndDate').value = end;
+        $('rEndDate').value = end;
       }
     }
-    function calculateInstallmentsFromAmount() {
-      const amount = parseMoney($('lAmount').value);
-      const installmentAmount = parseMoney($('lInstallmentAmount').value);
-      const startDate = $('lStartDate').value;
+    function calculateRecordInstallmentsFromAmount() {
+      const amount = parseMoney($('rAmount').value);
+      const installmentAmount = parseMoney($('rInstallmentAmount').value);
+      const startDate = $('rStartDate').value;
       if (amount > 0 && installmentAmount > 0) {
         const installments = Math.max(1, Math.ceil(amount / installmentAmount));
-        $('lInstallments').value = installments;
+        $('rInstallments').value = installments;
       }
-      if (startDate && $('lInstallments').value) {
-        const end = addMonths(startDate, parseInt($('lInstallments').value) - 1);
-        $('lEndDate').value = end;
+      if (startDate && $('rInstallments').value) {
+        const end = addMonths(startDate, parseInt($('rInstallments').value) - 1);
+        $('rEndDate').value = end;
       }
     }
-    function openSheetAddLoanForTeacher() {
+    function openSheetAddRecordForTeacher() {
       const teacher = getTeachers().find(t => t.id === currentTeacherId);
       if (!teacher) return;
-      selectedLoanType = 'advance';
+      selectedRecordType = 'prestamo';
       openSheet(`
-        <div class="sheet-title">Nuevo Registro - ${escapeHtml(teacher.name)}</div>
-        <form onsubmit="event.preventDefault(); saveLoan('${teacher.id}');">
+        <div class="sheet-title">Nuevo Registro — ${escapeHtml(teacher.name)}</div>
+        <form onsubmit="event.preventDefault(); saveRecord('${teacher.id}');">
           <div class="input-group"><label>Tipo</label>
             <div class="radio-group">
-              <div class="radio-option selected" onclick="selectLoanType(this, 'advance')" data-type="advance"><div class="radio-icon">💰</div><div class="radio-label">Adelanto</div><div class="radio-sublabel">De salario</div></div>
-              <div class="radio-option" onclick="selectLoanType(this, 'cafeteria')" data-type="cafeteria"><div class="radio-icon">🍽️</div><div class="radio-label">Merienda</div><div class="radio-sublabel">Cafetería</div></div>
-              <div class="radio-option" onclick="selectLoanType(this, 'other')" data-type="other"><div class="radio-icon">📋</div><div class="radio-label">Otro</div><div class="radio-sublabel">Consumo/vario</div></div>
+              <div class="radio-option selected" onclick="selectRecordType(this, 'prestamo')" data-type="prestamo"><div class="radio-icon">💰</div><div class="radio-label">Préstamo</div><div class="radio-sublabel">Debe devolver</div></div>
+              <div class="radio-option" onclick="selectRecordType(this, 'descuento')" data-type="descuento"><div class="radio-icon">📋</div><div class="radio-label">Descuento</div><div class="radio-sublabel">De nómina</div></div>
             </div>
           </div>
-          <div class="input-group" id="descGroup" style="display:none;"><label>Descripción (qué consumió)</label><input type="text" class="input" id="lDescription" placeholder="Ej: Almuerzo + jugo + galletas"></div>
-          <div class="input-group"><label>Monto</label><input type="number" class="input" id="lAmount" placeholder="Ej: 500000" min="1" step="1000" required></div>
-          <div class="input-group"><label>Fecha del registro</label><input type="date" class="input" id="lDate" required></div>
-          <div style="background:var(--bg-glass);border-radius:var(--radius-sm);padding:16px;margin-bottom:20px;border:1px solid var(--border-glass);">
-            <div style="font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.8px;">Plan de descuentos de nómina</div>
-            <div class="input-group"><label>Inicio descuento</label><input type="date" class="input" id="lStartDate"></div>
-            <div class="input-group"><label>Número de cuotas</label><input type="number" class="input" id="lInstallments" placeholder="Ej: 3" min="1" max="48" onchange="calculateInstallment()"></div>
-            <div class="input-group"><label>Día de descuento (del mes)</label><input type="number" class="input" id="lInstallmentDay" placeholder="Ej: 15" min="1" max="31" onchange="calculateInstallment()"></div>
-            <div style="display:flex;gap:10px;">
-              <div class="input-group" style="flex:1;"><label>Monto cuota</label><input type="number" class="input" id="lInstallmentAmount" placeholder="Calculado" min="1" step="1000" onchange="calculateInstallmentsFromAmount()"></div>
-              <div class="input-group" style="flex:1;"><label>Fin descuento</label><input type="date" class="input" id="lEndDate" readonly style="color:var(--text-muted);"></div>
+          <div class="input-group" id="conceptGroup" style="display:none;"><label>Concepto</label><input type="text" class="input" id="rConcept" placeholder="Ej: Uniforme, material, multa..."></div>
+          <div class="input-group"><label>Monto</label><input type="number" class="input" id="rAmount" placeholder="Ej: 500000" min="1" step="1000" required></div>
+          <div class="input-group"><label>Fecha</label><input type="date" class="input" id="rDate" required></div>
+          <div id="descuentoOptions" style="display:none;">
+            <div style="background:var(--bg-glass);border-radius:var(--radius-sm);padding:16px;margin-bottom:20px;border:1px solid var(--border-glass);">
+              <div style="font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.8px;">Plan de descuentos</div>
+              <div class="input-group"><label>Inicio descuento</label><input type="date" class="input" id="rStartDate"></div>
+              <div class="input-group"><label>Número de cuotas</label><input type="number" class="input" id="rInstallments" placeholder="Ej: 3" min="1" max="48" onchange="calculateRecordInstallment()"></div>
+              <div class="input-group"><label>Día de descuento (del mes)</label><input type="number" class="input" id="rInstallmentDay" placeholder="Ej: 15" min="1" max="31" onchange="calculateRecordInstallment()"></div>
+              <div style="display:flex;gap:10px;">
+                <div class="input-group" style="flex:1;"><label>Monto cuota</label><input type="number" class="input" id="rInstallmentAmount" placeholder="Calculado" min="1" step="1000" onchange="calculateRecordInstallmentsFromAmount()"></div>
+                <div class="input-group" style="flex:1;"><label>Fin descuento</label><input type="date" class="input" id="rEndDate" readonly style="color:var(--text-muted);"></div>
+              </div>
+            </div>
+            <div class="checkbox-row" onclick="document.getElementById('rLiquidation').click();">
+              <input type="checkbox" id="rLiquidation" onchange="toggleLiquidation()">
+              <label for="rLiquidation">Descontar de la liquidación final</label>
+            </div>
+            <div id="liquidationWarning" style="display:none;background:rgba(220,38,38,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:var(--radius-sm);padding:12px;margin-bottom:16px;font-size:13px;color:var(--danger);">
+              ⚠️ Este descuento se descontará completamente de la liquidación final del docente.
             </div>
           </div>
-          <div class="input-group"><label>Notas adicionales</label><input type="text" class="input" id="lNotes" placeholder="Ej: Urgente, descontar antes de vacaciones"></div>
+          <div class="input-group"><label>Notas adicionales</label><input type="text" class="input" id="rNotes" placeholder="Ej: Urgente, descontar antes de vacaciones"></div>
           <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;">Guardar</button>
         </form>
       `);
-      $('lDate').valueAsDate = new Date();
-      setTimeout(() => $('lAmount').focus(), 350);
+      $('rDate').valueAsDate = new Date();
+      setTimeout(() => $('rAmount').focus(), 350);
     }
-    function saveLoan(forcedTeacherId) {
-      const teacherId = forcedTeacherId || $('lTeacher').value;
-      const amount = parseMoney($('lAmount').value);
-      const date = $('lDate').value;
-      const description = $('lDescription') ? $('lDescription').value.trim() : '';
-      const startDate = $('lStartDate').value;
-      const endDate = $('lEndDate').value;
-      const installments = parseInt($('lInstallments').value) || 0;
-      const installmentAmount = parseMoney($('lInstallmentAmount').value);
-      const installmentDay = parseInt($('lInstallmentDay').value) || null;
-      const notes = $('lNotes').value.trim();
+    function saveRecord(forcedTeacherId) {
+      const teacherId = forcedTeacherId || $('rTeacher').value;
+      const amount = parseMoney($('rAmount').value);
+      const date = $('rDate').value;
+      const concept = $('rConcept') ? $('rConcept').value.trim() : '';
+      const startDate = $('rStartDate') ? $('rStartDate').value : '';
+      const endDate = $('rEndDate') ? $('rEndDate').value : '';
+      const installments = parseInt($('rInstallments') ? $('rInstallments').value : 0) || 0;
+      const installmentAmount = parseMoney($('rInstallmentAmount') ? $('rInstallmentAmount').value : 0);
+      const installmentDay = parseInt($('rInstallmentDay') ? $('rInstallmentDay').value : 0) || null;
+      const deductFromLiquidation = $('rLiquidation') ? $('rLiquidation').checked : false;
+      const notes = $('rNotes').value.trim();
+      
       if (!teacherId || amount <= 0 || !date) { showToast('Completa los campos obligatorios', 'error'); return; }
-      const loans = getLoans();
-      loans.push({
-        id: DB.id(), teacherId, type: selectedLoanType, description, amount, date,
+      if (selectedRecordType === 'descuento' && !concept) { showToast('Ingresa el concepto del descuento', 'error'); return; }
+      
+      const records = getRecords();
+      records.push({
+        id: DB.id(), teacherId, type: selectedRecordType, concept, amount, date,
         startDate, endDate, installments, installmentAmount, installmentDay,
-        notes, status: 'active', createdAt: DB.now()
+        deductFromLiquidation, notes, status: 'active', createdAt: DB.now()
       });
-      setLoans(loans);
+      setRecords(records);
       closeSheet();
       showToast('Registro guardado');
       if (currentTeacherId === teacherId) renderTeacherDetail();
@@ -1138,76 +1235,95 @@
     }
     
     // ===== PAYMENTS =====
-    function openSheetAddPayment(loanId, isSalary) {
-      const loan = getLoans().find(l => l.id === loanId);
-      if (!loan) return;
-      const teacher = getTeachers().find(t => t.id === loan.teacherId);
-      const balance = getLoanBalance(loan);
+    function openSheetAddPayment(recordId) {
+      const record = getRecords().find(r => r.id === recordId);
+      if (!record) return;
+      const teacher = getTeachers().find(t => t.id === record.teacherId);
+      const balance = getRecordBalance(record);
       openSheet(`
-        <div class="sheet-title">${isSalary ? 'Descontar de Salario' : 'Registrar Abono Libre'}</div>
+        <div class="sheet-title">Registrar Abono</div>
         <div style="background:var(--bg-card);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:20px;border:1px solid var(--border-glass);">
           <div style="font-size:13px;color:var(--text-secondary);margin-bottom:4px;">Saldo por descontar</div>
           <div style="font-size:20px;font-weight:700;color:var(--danger);">${formatCurrency(balance)}</div>
           ${teacher ? `<div style="font-size:12px;color:var(--text-muted);margin-top:6px;">Docente: ${escapeHtml(teacher.name)}</div>` : ''}
         </div>
-        <form onsubmit="event.preventDefault(); savePayment('${loanId}', ${isSalary ? 'true' : 'false'});">
-          <div class="input-group"><label>Monto ${isSalary ? 'a descontar' : 'del abono'}</label><input type="number" class="input" id="pAmount" placeholder="Ej: 200000" min="1" max="${balance}" step="1000" required></div>
-          <div class="input-group"><label>Fecha del descuento</label><input type="date" class="input" id="pDate" required></div>
-          <div class="input-group"><label>Notas (opcional)</label><input type="text" class="input" id="pNotes" placeholder="${isSalary ? 'Ej: Descuento quincena mayo' : 'Ej: Pago en efectivo'}"></div>
-          <button type="submit" class="btn ${isSalary ? 'btn-secondary' : 'btn-success'} btn-block" style="margin-top:8px;">${isSalary ? 'Registrar Descuento' : 'Registrar Abono'}</button>
+        <form onsubmit="event.preventDefault(); savePayment('${recordId}');">
+          <div class="input-group"><label>Monto del abono</label><input type="number" class="input" id="pAmount" placeholder="Ej: 200000" min="1" max="${balance}" step="1000" required></div>
+          <div class="input-group"><label>Fecha</label><input type="date" class="input" id="pDate" required></div>
+          <div class="input-group"><label>Notas (opcional)</label><input type="text" class="input" id="pNotes" placeholder="Ej: Pago en efectivo"></div>
+          <button type="submit" class="btn btn-success btn-block" style="margin-top:8px;">Registrar Abono</button>
         </form>
       `);
       $('pDate').valueAsDate = new Date();
       setTimeout(() => $('pAmount').focus(), 350);
     }
-    function registerInstallmentPayment(loanId) {
-      const loan = getLoans().find(l => l.id === loanId);
-      if (!loan) return;
-      const instStatus = getInstallmentStatus(loan);
-      if (instStatus.nextIndex < 0 || instStatus.nextIndex >= loan.installments) {
+    function registerInstallmentPayment(recordId) {
+      const record = getRecords().find(r => r.id === recordId);
+      if (!record) return;
+      const instStatus = getInstallmentStatus(record);
+      if (instStatus.nextIndex < 0 || instStatus.nextIndex >= record.installments) {
         showToast('Todas las cuotas ya fueron descontadas', 'warning');
         return;
       }
-      const amount = loan.installmentAmount || 0;
+      const amount = record.installmentAmount || 0;
       const date = todayStr();
       const payments = getPayments();
       payments.push({
-        id: DB.id(), loanId, amount, date, notes: 'Descuento de cuota #' + (instStatus.nextIndex + 1),
+        id: DB.id(), recordId, amount, date, notes: 'Descuento cuota #' + (instStatus.nextIndex + 1),
         type: 'installment', installmentNumber: instStatus.nextIndex + 1, createdAt: DB.now()
       });
       setPayments(payments);
-      const newBalance = getLoanBalance(loan);
+      const newBalance = getRecordBalance(record);
       if (newBalance <= 0) {
-        const loans = getLoans();
-        const idx = loans.findIndex(l => l.id === loanId);
-        if (idx >= 0) { loans[idx].status = 'paid'; setLoans(loans); }
+        const records = getRecords();
+        const idx = records.findIndex(r => r.id === recordId);
+        if (idx >= 0) { records[idx].status = 'paid'; setRecords(records); }
       }
       showToast('Cuota #' + (instStatus.nextIndex + 1) + ' descontada');
-      if (currentLoanId === loanId) renderLoanDetail();
-      else if (currentTeacherId === loan.teacherId) renderTeacherDetail();
+      if (currentRecordId === recordId) renderRecordDetail();
+      else if (currentTeacherId === record.teacherId) renderTeacherDetail();
       else if ($('screenDashboard').classList.contains('active')) renderDashboard();
     }
-    function savePayment(loanId, isSalary) {
+    function registerLiquidationPayment(recordId) {
+      const record = getRecords().find(r => r.id === recordId);
+      if (!record) return;
+      const balance = getRecordBalance(record);
+      if (balance <= 0) { showToast('Este descuento ya está completado', 'warning'); return; }
+      const payments = getPayments();
+      payments.push({
+        id: DB.id(), recordId, amount: balance, date: todayStr(),
+        notes: 'Descuento de liquidación final', type: 'liquidation', createdAt: DB.now()
+      });
+      setPayments(payments);
+      const records = getRecords();
+      const idx = records.findIndex(r => r.id === recordId);
+      if (idx >= 0) { records[idx].status = 'paid'; setRecords(records); }
+      showToast('Descuento de liquidación registrado');
+      if (currentRecordId === recordId) renderRecordDetail();
+      else if (currentTeacherId === record.teacherId) renderTeacherDetail();
+      else if ($('screenDashboard').classList.contains('active')) renderDashboard();
+    }
+    function savePayment(recordId) {
       const amount = parseMoney($('pAmount').value);
       const date = $('pDate').value;
       const notes = $('pNotes').value.trim();
-      const loan = getLoans().find(l => l.id === loanId);
-      if (!loan || amount <= 0 || !date) { showToast('Completa todos los campos', 'error'); return; }
-      const balance = getLoanBalance(loan);
+      const record = getRecords().find(r => r.id === recordId);
+      if (!record || amount <= 0 || !date) { showToast('Completa todos los campos', 'error'); return; }
+      const balance = getRecordBalance(record);
       if (amount > balance) { showToast('El monto excede el saldo por descontar', 'error'); return; }
       const payments = getPayments();
-      payments.push({ id: DB.id(), loanId, amount, date, notes, type: isSalary ? 'salary' : 'payment', createdAt: DB.now() });
+      payments.push({ id: DB.id(), recordId, amount, date, notes, type: 'payment', createdAt: DB.now() });
       setPayments(payments);
       const newBalance = balance - amount;
       if (newBalance <= 0) {
-        const loans = getLoans();
-        const idx = loans.findIndex(l => l.id === loanId);
-        if (idx >= 0) { loans[idx].status = 'paid'; setLoans(loans); }
+        const records = getRecords();
+        const idx = records.findIndex(r => r.id === recordId);
+        if (idx >= 0) { records[idx].status = 'paid'; setRecords(records); }
       }
       closeSheet();
-      showToast(isSalary ? 'Descuento registrado' : 'Abono registrado');
-      if (currentLoanId === loanId) renderLoanDetail();
-      else if (currentTeacherId === loan.teacherId) renderTeacherDetail();
+      showToast('Abono registrado');
+      if (currentRecordId === recordId) renderRecordDetail();
+      else if (currentTeacherId === record.teacherId) renderTeacherDetail();
       else if ($('screenDashboard').classList.contains('active')) renderDashboard();
     }
     
@@ -1221,7 +1337,7 @@
       $('menuOverlay').classList.remove('active');
     }
     function exportData() {
-      const data = { teachers: getTeachers(), loans: getLoans(), payments: getPayments(), exportedAt: new Date().toISOString() };
+      const data = { teachers: getTeachers(), records: getRecords(), payments: getPayments(), exportedAt: new Date().toISOString() };
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -1242,7 +1358,7 @@
         try {
           const data = JSON.parse(e.target.result);
           if (data.teachers) setTeachers(data.teachers);
-          if (data.loans) setLoans(data.loans);
+          if (data.records || data.loans) setRecords(data.records || data.loans);
           if (data.payments) setPayments(data.payments);
           showToast('Datos importados correctamente');
           renderDashboard();
@@ -1266,14 +1382,15 @@
     }
     function resetAllData() {
       localStorage.removeItem(KEYS.TEACHERS);
-      localStorage.removeItem(KEYS.LOANS);
+      localStorage.removeItem(KEYS.RECORDS);
       localStorage.removeItem(KEYS.PAYMENTS);
       closeSheet();
       showToast('Todos los datos han sido eliminados');
       currentTeacherId = null;
-      currentLoanId = null;
+      currentRecordId = null;
       renderDashboard();
       showScreen('screenDashboard');
+      setNavActive('navDashboard');
     }
     
     // ===== INIT =====
