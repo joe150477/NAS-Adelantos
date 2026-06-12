@@ -1,1400 +1,634 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="EduDescuentos">
-  <meta name="theme-color" content="#0f0f0f">
-  <title>EduDescuentos - Gestión de Préstamos y Descuentos</title>
-  <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiRWR1RGVzY3VlbnRvcyIsInNob3J0X25hbWUiOiJFRGVzY3VlbnRvcyIsInN0YXJ0X3VybCI6IiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwZjBmMGYiLCJ0aGVtZV9jb2xvciI6IiMwZjBmMGYifQ==">
-  <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; background: #0f0f0f; color: #fff; overflow-x: hidden; overscroll-behavior-y: none; -webkit-font-smoothing: antialiased; }
-    :root { --bg-primary: #0f0f0f; --bg-secondary: #141418; --bg-card: rgba(24,24,30,0.92); --bg-glass: rgba(255,255,255,0.04); --border-glass: rgba(255,255,255,0.06); --accent: #6366f1; --accent-light: #a5b4fc; --accent-glow: rgba(99,102,241,0.25); --text-primary: #f1f5f9; --text-secondary: rgba(241,245,249,0.55); --text-muted: rgba(241,245,249,0.3); --success: #34d399; --warning: #fbbf24; --danger: #f87171; --info: #60a5fa; --radius-sm: 14px; --radius-md: 20px; --radius-lg: 28px; --shadow-sm: 0 2px 12px rgba(0,0,0,0.25); --shadow-md: 0 8px 40px rgba(0,0,0,0.35); }
-    ::-webkit-scrollbar { display: none; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes slideUp { from { transform: translateY(110%); } to { transform: translateY(0); } }
-    @keyframes scaleIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
-    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
-    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    @keyframes slideInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
-    .animate-fade { animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    .animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    .animate-scale { animation: scaleIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    .animate-slide-right { animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    .stagger-1 { animation-delay: 0.05s; opacity: 0; }
-    .stagger-2 { animation-delay: 0.1s; opacity: 0; }
-    .stagger-3 { animation-delay: 0.15s; opacity: 0; }
-    .stagger-4 { animation-delay: 0.2s; opacity: 0; }
-    .stagger-5 { animation-delay: 0.25s; opacity: 0; }
-    .stagger-6 { animation-delay: 0.3s; opacity: 0; }
-    .glass { background: var(--bg-glass); backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%); border: 1px solid var(--border-glass); border-radius: var(--radius-md); }
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 24px; border-radius: var(--radius-sm); border: none; font-size: 15px; font-weight: 600; color: #fff; cursor: pointer; transition: all 0.2s ease; position: relative; overflow: hidden; }
-    .btn-primary { background: linear-gradient(135deg, #4f46e5, #7c3aed); box-shadow: 0 4px 20px rgba(79,70,229,0.35); }
-    .btn-primary:active { transform: scale(0.95); box-shadow: 0 2px 10px rgba(79,70,229,0.25); }
-    .btn-secondary { background: var(--bg-glass); border: 1px solid var(--border-glass); color: var(--text-primary); }
-    .btn-secondary:active { background: rgba(255,255,255,0.08); transform: scale(0.95); }
-    .btn-danger { background: linear-gradient(135deg, #dc2626, #f87171); }
-    .btn-success { background: linear-gradient(135deg, #059669, #34d399); }
-    .btn-info { background: linear-gradient(135deg, #2563eb, #60a5fa); }
-    .btn-warning { background: linear-gradient(135deg, #d97706, #fbbf24); color: #000; }
-    .btn-block { width: 100%; }
-    .btn-sm { padding: 10px 16px; font-size: 13px; }
-    .btn-xs { padding: 6px 12px; font-size: 12px; }
-    .fab { position: fixed; bottom: calc(24px + env(safe-area-inset-bottom)); right: 24px; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #4f46e5, #7c3aed); box-shadow: 0 6px 24px rgba(79,70,229,0.4), 0 0 0 1px rgba(255,255,255,0.1) inset; display: flex; align-items: center; justify-content: center; border: none; color: #fff; font-size: 28px; cursor: pointer; z-index: 100; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-    .fab:active { transform: scale(0.88); }
-    .fab svg { width: 26px; height: 26px; }
-    .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(6px); z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.35s; }
-    .sheet-overlay.active { opacity: 1; pointer-events: all; }
-    .sheet { position: fixed; left: 0; right: 0; bottom: 0; background: linear-gradient(180deg, #1a1a22 0%, #0f0f14 100%); border-radius: var(--radius-lg) var(--radius-lg) 0 0; padding: 24px; padding-bottom: calc(32px + env(safe-area-inset-bottom)); transform: translateY(105%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); z-index: 201; max-height: 90vh; overflow-y: auto; border-top: 1px solid var(--border-glass); }
-    .sheet.active { transform: translateY(0); }
-    .sheet-handle { width: 40px; height: 5px; background: rgba(255,255,255,0.15); border-radius: 3px; margin: 0 auto 24px; }
-    .sheet-title { font-size: 20px; font-weight: 700; margin-bottom: 24px; text-align: center; }
-    .input-group { margin-bottom: 20px; }
-    .input-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.8px; }
-    .input { width: 100%; padding: 14px 16px; background: var(--bg-glass); border: 1px solid var(--border-glass); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 16px; outline: none; transition: all 0.25s; font-family: inherit; }
-    .input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); background: rgba(255,255,255,0.06); }
-    .input::placeholder { color: var(--text-muted); }
-    select.input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='rgba(255,255,255,0.4)' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px; }
-    .radio-group { display: flex; gap: 10px; flex-wrap: wrap; }
-    .radio-option { flex: 1; min-width: 100px; padding: 14px; background: var(--bg-glass); border: 2px solid var(--border-glass); border-radius: var(--radius-sm); text-align: center; cursor: pointer; transition: all 0.2s; }
-    .radio-option.selected { border-color: var(--accent); background: rgba(99,102,241,0.1); }
-    .radio-option:active { transform: scale(0.96); }
-    .radio-icon { font-size: 24px; margin-bottom: 6px; }
-    .radio-label { font-size: 13px; font-weight: 600; color: var(--text-primary); }
-    .radio-sublabel { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-    .checkbox-row { display: flex; align-items: center; gap: 12px; padding: 14px; background: var(--bg-glass); border: 1px solid var(--border-glass); border-radius: var(--radius-sm); cursor: pointer; margin-bottom: 16px; }
-    .checkbox-row input { width: 20px; height: 20px; accent-color: var(--accent); }
-    .checkbox-row label { font-size: 14px; font-weight: 500; color: var(--text-primary); cursor: pointer; }
-    .list-item { display: flex; align-items: center; gap: 14px; padding: 16px; background: var(--bg-card); border-radius: var(--radius-sm); margin-bottom: 10px; border: 1px solid var(--border-glass); transition: all 0.25s ease; cursor: pointer; position: relative; overflow: hidden; }
-    .list-item::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: linear-gradient(180deg, var(--accent), var(--accent-light)); opacity: 0; transition: opacity 0.3s; }
-    .list-item:active { transform: scale(0.98); background: rgba(255,255,255,0.04); }
-    .list-item:active::before { opacity: 1; }
-    .list-avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; color: #fff; flex-shrink: 0; background: linear-gradient(135deg, var(--accent), #7c3aed); box-shadow: 0 2px 12px rgba(99,102,241,0.3); }
-    .list-content { flex: 1; min-width: 0; }
-    .list-title { font-size: 16px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .list-subtitle { font-size: 13px; color: var(--text-secondary); margin-top: 3px; }
-    .list-meta { text-align: right; flex-shrink: 0; }
-    .list-amount { font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
-    .list-amount.positive { color: var(--success); }
-    .list-amount.negative { color: var(--danger); }
-    .list-amount.neutral { color: var(--text-secondary); }
-    .list-badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; margin-top: 4px; display: inline-block; }
-    .badge-success { background: rgba(52,211,153,0.12); color: var(--success); }
-    .badge-warning { background: rgba(251,191,36,0.12); color: var(--warning); }
-    .badge-danger { background: rgba(248,113,113,0.12); color: var(--danger); }
-    .badge-info { background: rgba(96,165,250,0.12); color: var(--info); }
-    .badge-liquidation { background: rgba(220,38,38,0.15); color: #fca5a5; }
-    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px; }
-    .stat-card { background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 20px; position: relative; overflow: hidden; transition: transform 0.3s; }
-    .stat-card:active { transform: scale(0.97); }
-    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent-light)); opacity: 0.7; }
-    .stat-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
-    .stat-icon svg { width: 20px; height: 20px; }
-    .stat-icon.purple { background: rgba(99,102,241,0.12); color: var(--accent-light); }
-    .stat-icon.green { background: rgba(52,211,153,0.12); color: var(--success); }
-    .stat-icon.red { background: rgba(248,113,113,0.12); color: var(--danger); }
-    .stat-icon.amber { background: rgba(251,191,36,0.12); color: var(--warning); }
-    .stat-icon.blue { background: rgba(96,165,250,0.12); color: var(--info); }
-    .stat-label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; font-weight: 600; }
-    .stat-value { font-size: 22px; font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
-    .app-header { position: sticky; top: 0; z-index: 50; background: rgba(15,15,15,0.88); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-bottom: 1px solid var(--border-glass); padding: 16px 20px; padding-top: calc(16px + env(safe-area-inset-top)); }
-    .app-header-content { display: flex; align-items: center; justify-content: space-between; }
-    .app-header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
-    .app-header p { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
-    .header-actions { display: flex; gap: 8px; }
-    .header-btn { width: 38px; height: 38px; border-radius: 12px; border: none; background: var(--bg-glass); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; border: 1px solid var(--border-glass); }
-    .header-btn:active { background: rgba(255,255,255,0.1); transform: scale(0.92); }
-    .header-btn svg { width: 18px; height: 18px; }
-    .section-title { font-size: 13px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin: 28px 0 14px; padding: 0 4px; }
-    .empty-state { text-align: center; padding: 60px 20px; }
-    .empty-icon { width: 80px; height: 80px; margin: 0 auto 20px; opacity: 0.4; }
-    .empty-title { font-size: 18px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; }
-    .empty-text { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
-    .toast { position: fixed; top: calc(20px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%) translateY(-120px); background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: var(--radius-sm); padding: 14px 24px; box-shadow: var(--shadow-md); z-index: 300; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1); max-width: 90vw; }
-    .toast.show { transform: translateX(-50%) translateY(0); }
-    .toast.success { border-left: 3px solid var(--success); }
-    .toast.error { border-left: 3px solid var(--danger); }
-    .toast.warning { border-left: 3px solid var(--warning); }
-    .scrollable { -webkit-overflow-scrolling: touch; overflow-y: auto; }
-    .currency { font-variant-numeric: tabular-nums; }
-    .detail-header { padding: 24px 20px; text-align: center; border-bottom: 1px solid var(--border-glass); }
-    .detail-avatar { width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; color: #fff; background: linear-gradient(135deg, var(--accent), #7c3aed); box-shadow: 0 4px 20px rgba(99,102,241,0.3); }
-    .detail-name { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-    .detail-role { font-size: 14px; color: var(--text-secondary); }
-    .detail-salary { font-size: 15px; color: var(--text-muted); margin-top: 8px; }
-    .detail-salary strong { color: var(--accent-light); font-weight: 600; }
-    .detail-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 20px; }
-    .detail-stat { text-align: center; padding: 16px 8px; background: var(--bg-card); border-radius: var(--radius-sm); border: 1px solid var(--border-glass); }
-    .detail-stat-value { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-    .detail-stat-label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
-    .tabs { display: flex; gap: 8px; padding: 0 20px 16px; border-bottom: 1px solid var(--border-glass); }
-    .tab { flex: 1; padding: 10px; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-    .tab.active { background: var(--bg-glass); color: var(--text-primary); border: 1px solid var(--border-glass); }
-    .tab:active { transform: scale(0.95); }
-    .timeline-item { display: flex; gap: 14px; padding: 16px 20px; position: relative; }
-    .timeline-item:not(:last-child)::before { content: ''; position: absolute; left: 35px; top: 48px; bottom: -8px; width: 2px; background: linear-gradient(180deg, var(--border-glass), transparent); }
-    .timeline-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; z-index: 2; }
-    .timeline-dot.loan { background: rgba(248,113,113,0.15); color: var(--danger); }
-    .timeline-dot.payment { background: rgba(52,211,153,0.15); color: var(--success); }
-    .timeline-dot.installment { background: rgba(251,191,36,0.15); color: var(--warning); }
-    .timeline-dot.liquidation { background: rgba(220,38,38,0.15); color: #fca5a5; }
-    .timeline-dot svg { width: 14px; height: 14px; }
-    .timeline-content { flex: 1; }
-    .timeline-title { font-size: 15px; font-weight: 600; margin-bottom: 3px; }
-    .timeline-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; }
-    .timeline-date { font-size: 11px; color: var(--text-muted); }
-    .timeline-amount { font-size: 16px; font-weight: 700; text-align: right; flex-shrink: 0; font-variant-numeric: tabular-nums; }
-    .timeline-amount.negative { color: var(--danger); }
-    .timeline-amount.positive { color: var(--success); }
-    .action-row { display: flex; gap: 10px; padding: 16px 20px; }
-    .action-row .btn { flex: 1; }
-    .menu-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 150; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-    .menu-overlay.active { opacity: 1; pointer-events: all; }
-    .menu-sheet { position: fixed; left: 0; right: 0; bottom: 0; background: var(--bg-secondary); border-radius: var(--radius-lg) var(--radius-lg) 0 0; z-index: 151; transform: translateY(105%); transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); padding: 20px; padding-bottom: calc(32px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border-glass); }
-    .menu-sheet.active { transform: translateY(0); }
-    .menu-item { display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.2s; }
-    .menu-item:active { background: rgba(255,255,255,0.05); transform: scale(0.98); }
-    .menu-item-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
-    .menu-item-icon svg { width: 18px; height: 18px; }
-    .menu-item-text { font-size: 15px; font-weight: 500; }
-    .menu-item-danger .menu-item-text { color: var(--danger); }
-    .progress-bar { height: 6px; background: var(--bg-glass); border-radius: 3px; overflow: hidden; margin-top: 8px; }
-    .progress-fill { height: 100%; border-radius: 3px; transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
-    .progress-fill.success { background: linear-gradient(90deg, var(--success), #6ee7b7); }
-    .progress-fill.warning { background: linear-gradient(90deg, var(--warning), #fcd34d); }
-    .progress-fill.danger { background: linear-gradient(90deg, var(--danger), #fca5a5); }
-    .loan-card { padding: 20px; background: var(--bg-card); border-radius: var(--radius-md); border: 1px solid var(--border-glass); margin-bottom: 12px; }
-    .loan-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-    .loan-card-title { font-size: 15px; font-weight: 600; }
-    .loan-card-date { font-size: 12px; color: var(--text-muted); }
-    .loan-card-amount { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-    .loan-card-balance { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; }
-    .loan-card-actions { display: flex; gap: 8px; }
-    .loan-card-actions .btn { flex: 1; padding: 10px; font-size: 13px; }
-    .app-container { max-width: 480px; margin: 0 auto; min-height: 100vh; position: relative; }
-    .content { padding: 0 20px 100px; }
-    .back-btn { display: inline-flex; align-items: center; gap: 6px; color: var(--text-secondary); font-size: 14px; font-weight: 500; margin-bottom: 12px; cursor: pointer; border: none; background: none; padding: 4px 0; }
-    .back-btn svg { width: 18px; height: 18px; }
-    .screen { display: none; }
-    .screen.active { display: block; animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-    .installment-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 16px; }
-    .installment-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 12px; font-weight: 600; background: var(--bg-glass); border: 1px solid var(--border-glass); color: var(--text-muted); }
-    .installment-cell.paid { background: rgba(52,211,153,0.15); border-color: rgba(52,211,153,0.3); color: var(--success); }
-    .installment-cell.pending { background: rgba(255,255,255,0.03); border-color: var(--border-glass); color: var(--text-muted); }
-    .installment-cell.next { background: rgba(99,102,241,0.15); border-color: var(--accent); color: var(--accent-light); box-shadow: 0 0 0 1px var(--accent); }
-    .installment-legend { display: flex; gap: 16px; margin-top: 12px; justify-content: center; }
-    .installment-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-secondary); }
-    .installment-legend-dot { width: 10px; height: 10px; border-radius: 3px; }
-    .installment-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 16px 0; }
-    .installment-summary-item { text-align: center; padding: 14px 8px; background: var(--bg-card); border-radius: var(--radius-sm); border: 1px solid var(--border-glass); }
-    .installment-summary-value { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
-    .installment-summary-label { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
-    .condition-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-glass); font-size: 14px; }
-    .condition-row:last-child { border-bottom: none; }
-    .condition-label { color: var(--text-secondary); }
-    .condition-value { font-weight: 600; color: var(--text-primary); }
-    .type-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-    .type-badge.prestamo { background: rgba(96,165,250,0.12); color: var(--info); }
-    .type-badge.descuento { background: rgba(251,191,36,0.12); color: var(--warning); }
-    .type-badge.liquidacion { background: rgba(220,38,38,0.15); color: #fca5a5; }
-    .dashboard-card { background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 20px; margin-bottom: 12px; }
-    .dashboard-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-    .dashboard-card-title { font-size: 15px; font-weight: 600; }
-    .dashboard-card-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-    .alert-card { background: linear-gradient(135deg, rgba(220,38,38,0.1), rgba(248,113,113,0.05)); border: 1px solid rgba(248,113,113,0.2); border-radius: var(--radius-md); padding: 16px; margin: 0 20px 12px; }
-    .alert-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-    .alert-icon { width: 32px; height: 32px; border-radius: 8px; background: rgba(248,113,113,0.15); display: flex; align-items: center; justify-content: center; color: var(--danger); }
-    .alert-title { font-size: 15px; font-weight: 600; color: var(--danger); }
-    .alert-text { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
-    .alert-amount { font-size: 18px; font-weight: 700; color: var(--danger); margin-top: 8px; }
-    .payroll-card { background: linear-gradient(135deg, rgba(79,70,229,0.15), rgba(124,58,237,0.1)); border: 1px solid rgba(99,102,241,0.2); border-radius: var(--radius-md); padding: 20px; margin: 0 20px 20px; }
-    .payroll-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
-    .payroll-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    .payroll-row:last-child { border-bottom: none; }
-    .payroll-label { color: var(--text-secondary); }
-    .payroll-value { font-weight: 600; }
-    .payroll-value.deduction { color: var(--danger); }
-    .payroll-value.net { color: var(--success); font-size: 18px; }
-    .payroll-total { display: flex; justify-content: space-between; padding: 12px 0 0; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); }
-    .copy-btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; background: var(--bg-glass); border: 1px solid var(--border-glass); border-radius: var(--radius-sm); color: var(--text-secondary); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-    .copy-btn:active { background: rgba(255,255,255,0.08); transform: scale(0.96); }
-    .copy-btn svg { width: 16px; height: 16px; }
-    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: rgba(15,15,15,0.92); backdrop-filter: blur(20px); border-top: 1px solid var(--border-glass); padding-bottom: env(safe-area-inset-bottom); z-index: 90; }
-    .bottom-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 0; color: var(--text-muted); font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; background: none; }
-    .bottom-nav-item.active { color: var(--accent-light); }
-    .bottom-nav-item svg { width: 22px; height: 22px; margin-bottom: 4px; }
-    .bottom-nav-item:active { transform: scale(0.92); }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>FootIQ · Mundial 2026 · BetPlay</title>
+<style>
+:root {
+  --bg:#06080d; --bg2:#0b0e17; --card:#111827; --border:#1c2538;
+  --text:#e2e8f4; --muted:#4a5a72; --accent:#2fa8f5; --gold:#f0bc35;
+  --green:#20c05a; --red:#e8404a; --orange:#f97316; --yellow:#facc15;
+  --dim:#6b7a90;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:system-ui;display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+
+/* === OVERLAY === */
+#overlay{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;}
+#overlay.gone{display:none;}
+.ov-ball{font-size:44px;animation:spin 2s linear infinite;}
+.ov-title{font-size:18px;font-weight:700;}
+.ov-sub{font-size:11px;color:var(--muted);}
+.ov-prog{width:280px;height:4px;background:var(--border);border-radius:2px;}
+.ov-fill{height:100%;background:var(--accent);width:0%;transition:width .2s;}
+.ov-step{font-size:12px;color:var(--muted);}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes blink{50%{opacity:.3}}
+
+/* === TOPBAR / TABS === */
+.topbar{display:flex;padding:10px 14px;border-bottom:1px solid var(--border);align-items:center;gap:8px;}
+.logo{font-size:20px;font-weight:900;} .logo em{color:var(--accent);}
+.spacer{flex:1;}
+.score-pill{background:var(--bg2);border-radius:99px;padding:3px 8px;font-size:12px;}
+.sdot{width:8px;height:8px;border-radius:50%;background:var(--muted);}
+.sdot.ok{background:var(--green);}
+.tabs{display:flex;overflow-x:auto;border-bottom:1px solid var(--border);}
+.tab{flex:1;text-align:center;padding:8px 2px;font-size:9px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab .ti{font-size:15px;display:block;}
+
+/* === PAGES === */
+.pages{flex:1;overflow:hidden;position:relative;}
+.page{position:absolute;inset:0;overflow-y:auto;padding:12px;display:none;}
+.page.active{display:block;}
+
+/* === CARDS / ROWS === */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;}
+.stitle{font-size:12px;font-weight:700;margin:10px 0 6px;display:flex;align-items:center;gap:5px;}
+.trow{display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px solid var(--border);}
+.tflg{font-size:18px;} .tname{font-size:12px;font-weight:600;flex:1;}
+.tpct{font-size:11px;font-weight:700;color:var(--accent);}
+.pill{font-size:9px;padding:1px 6px;border-radius:99px;}
+.pg{background:rgba(32,192,90,.2);color:var(--green);}
+
+/* === CHAMPION === */
+.champ-wrap{background:linear-gradient(135deg,#090f1e,#0d1c35);border-radius:16px;padding:18px;text-align:center;margin-bottom:10px;}
+.champ-flag{font-size:48px;} .champ-name{font-size:22px;font-weight:900;}
+.champ-pct{font-size:36px;font-weight:900;color:var(--gold);}
+
+/* === GROUPS === */
+.grp-card{background:var(--card);border-radius:12px;margin-bottom:8px;overflow:hidden;}
+.grp-head{background:var(--bg2);padding:8px 12px;font-weight:700;}
+.grp-team{display:flex;align-items:center;gap:7px;padding:6px 12px;border-bottom:1px solid var(--border);}
+
+/* === DUEL === */
+.ld-board{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.ld-card{text-align:center;padding:12px;border:2px solid var(--border);border-radius:12px;}
+.ld-name{font-size:11px;color:var(--muted);margin-bottom:4px;}
+.ld-score{font-size:32px;font-weight:900;}
+.ld-detail{font-size:10px;color:var(--muted);}
+
+/* === CALENDAR === */
+.cal-header{display:flex;justify-content:space-between;align-items:center;padding:8px;margin-bottom:8px;}
+.cal-nav{width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:var(--bg2);border-radius:50%;cursor:pointer;font-size:20px;user-select:none;}
+.cal-title{font-size:16px;font-weight:700;}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:10px;color:var(--muted);margin-bottom:6px;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-day{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--card);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:12px;font-weight:600;}
+.cal-day.has-match{border-color:rgba(47,168,245,.4);}
+.cal-day.active{background:var(--accent);color:#000;border-color:var(--accent);}
+.cal-day.active .cal-d-dot{background:#000;}
+.cal-day.past{opacity:.5;}
+.cal-d-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);margin-top:2px;}
+.cal-day-matches{margin-top:12px;}
+
+/* === MATCH CARD === */
+.mcard-dual{background:var(--card);border-radius:14px;padding:12px;margin-bottom:10px;}
+.match-header{display:flex;align-items:center;gap:7px;padding:6px 0;margin-bottom:8px;border-bottom:1px solid var(--border);}
+.match-group{font-size:9px;color:var(--muted);margin-left:auto;}
+.match-time{font-size:9px;color:var(--muted);}
+.model-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
+.model-box{padding:8px;border-radius:10px;}
+.model-box-title{font-size:10px;font-weight:700;color:var(--muted);margin-bottom:4px;}
+.model-box.actual{background:rgba(47,168,245,.1);border:1px solid rgba(47,168,245,.3);}
+.model-box.klement{background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.3);}
+.model-probs-mini{display:flex;gap:4px;margin:6px 0;}
+.mprob-mini{flex:1;text-align:center;background:rgba(255,255,255,.05);border-radius:6px;padding:4px;}
+.mpv{font-size:13px;font-weight:800;}
+.mlabel{font-size:8px;color:var(--muted);}
+.mscore{font-size:10px;color:var(--muted);margin-top:4px;}
+
+/* === BET === */
+.bet-market{background:rgba(0,0,0,.3);border-radius:12px;padding:10px;margin-top:10px;}
+.bet-market-title{font-size:10px;font-weight:700;color:var(--yellow);margin-bottom:6px;text-transform:uppercase;}
+.bet-odds{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.bet-option{background:var(--bg2);border-radius:8px;padding:6px 10px;text-align:center;min-width:68px;border:1px solid var(--border);}
+.bet-option .blabel{font-size:8px;color:var(--muted);}
+.bet-option .bval{font-size:12px;font-weight:800;color:var(--gold);}
+.bet-option .breason{font-size:8px;color:var(--dim);font-style:italic;}
+
+/* === RESULT === */
+.result-real{background:rgba(32,192,90,.1);border-radius:8px;padding:10px;margin-top:10px;text-align:center;border:1px solid var(--green);}
+.result-real .rscore{font-size:22px;font-weight:900;}
+.result-real .rlabel{font-size:9px;color:var(--muted);margin-top:2px;}
+
+/* === NO RESULT === */
+.no-result{background:rgba(240,188,53,.05);border-radius:8px;padding:8px;margin-top:8px;text-align:center;border:1px solid rgba(240,188,53,.3);font-size:10px;color:var(--muted);}
+</style>
 </head>
 <body>
-  <div class="app-container">
-    <!-- SCREEN: DASHBOARD -->
-    <div class="screen active" id="screenDashboard">
-      <div class="app-header">
-        <div class="app-header-content">
-          <div>
-            <h1>EduDescuentos</h1>
-            <p>Préstamos y descuentos de nómina</p>
-          </div>
-          <div class="header-actions">
-            <button class="header-btn" onclick="showDataMenu()" title="Datos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-6M6 20V10M18 20V4"/></svg></button>
-            <button class="header-btn" onclick="openSheetAddTeacher()" title="Nuevo docente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg></button>
-          </div>
-        </div>
-      </div>
-      <div class="content">
-        <div class="stats-grid" id="dashboardStats">
-          <div class="stat-card animate-fade stagger-1">
-            <div class="stat-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-            <div class="stat-label">Préstamos Activos</div>
-            <div class="stat-value currency" id="statTotalPrestamos">$0</div>
-          </div>
-          <div class="stat-card animate-fade stagger-2">
-            <div class="stat-icon amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
-            <div class="stat-label">Descuentos Activos</div>
-            <div class="stat-value currency" id="statTotalDescuentos">$0</div>
-          </div>
-          <div class="stat-card animate-fade stagger-3">
-            <div class="stat-icon red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-            <div class="stat-label">Por Descontar</div>
-            <div class="stat-value currency" id="statTotalPending">$0</div>
-          </div>
-          <div class="stat-card animate-fade stagger-4">
-            <div class="stat-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-            <div class="stat-label">Liquidación</div>
-            <div class="stat-value currency" id="statLiquidacion">$0</div>
-          </div>
-        </div>
-        
-        <div id="liquidationAlerts"></div>
-        
-        <div style="padding:0 20px 20px;">
-          <button class="btn btn-primary btn-block" onclick="openSheetMonthPayroll()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-            Calcular nómina del mes
-          </button>
-        </div>
-        
-        <div class="section-title">Docentes</div>
-        <div id="teachersList"></div>
-      </div>
-    </div>
-    
-    <!-- SCREEN: LIQUIDATION -->
-    <div class="screen" id="screenLiquidation">
-      <div class="app-header">
-        <div class="app-header-content">
-          <div>
-            <h1>Liquidación</h1>
-            <p>Descuentos de liquidación final</p>
-          </div>
-        </div>
-      </div>
-      <div class="content" id="liquidationContent"></div>
-    </div>
-    
-    <!-- SCREEN: TEACHER DETAIL -->
-    <div class="screen" id="screenTeacher">
-      <div class="app-header">
-        <div class="app-header-content">
-          <button class="back-btn" onclick="showScreen('screenDashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Volver</button>
-        </div>
-      </div>
-      <div id="teacherDetailContent"></div>
-      <button class="fab" onclick="openSheetAddRecordForTeacher()" title="Nuevo registro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
-    </div>
-    
-    <!-- SCREEN: RECORD DETAIL -->
-    <div class="screen" id="screenRecord">
-      <div class="app-header">
-        <div class="app-header-content">
-          <button class="back-btn" onclick="goBackFromRecord()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Volver</button>
-        </div>
-      </div>
-      <div id="recordDetailContent"></div>
-    </div>
-  </div>
-  
-  <!-- BOTTOM NAV -->
-  <div class="bottom-nav">
-    <button class="bottom-nav-item active" id="navDashboard" onclick="showScreen('screenDashboard'); setNavActive('navDashboard');">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      Inicio
-    </button>
-    <button class="bottom-nav-item" id="navLiquidation" onclick="showScreen('screenLiquidation'); renderLiquidation(); setNavActive('navLiquidation');">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-      Liquidación
-    </button>
-  </div>
-  
-  <!-- BOTTOM SHEET -->
-  <div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet()"></div>
-  <div class="sheet" id="sheet">
-    <div class="sheet-handle"></div>
-    <div id="sheetContent"></div>
-  </div>
-  
-  <!-- DATA MENU -->
-  <div class="menu-overlay" id="menuOverlay" onclick="closeDataMenu()"></div>
-  <div class="menu-sheet" id="menuSheet">
-    <div class="sheet-handle"></div>
-    <div class="menu-item" onclick="exportData(); closeDataMenu();">
-      <div class="menu-item-icon" style="background:rgba(52,211,153,0.12);color:var(--success)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
-      <span class="menu-item-text">Exportar datos (JSON)</span>
-    </div>
-    <div class="menu-item" onclick="importData(); closeDataMenu();">
-      <div class="menu-item-icon" style="background:rgba(99,102,241,0.12);color:var(--accent-light)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
-      <span class="menu-item-text">Importar datos (JSON)</span>
-    </div>
-    <div class="menu-item menu-item-danger" onclick="confirmResetData(); closeDataMenu();">
-      <div class="menu-item-icon" style="background:rgba(248,113,113,0.12);color:var(--danger)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>
-      <span class="menu-item-text">Borrar todos los datos</span>
-    </div>
-  </div>
-  
-  <!-- TOAST -->
-  <div class="toast" id="toast"><span id="toastIcon"></span><span id="toastMsg"></span></div>
-  
-  <!-- HIDDEN FILE INPUT FOR IMPORT -->
-  <input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImportFile(this)">
 
-  <script>
-    // ===== DATA LAYER =====
-    const DB = {
-      get: (key, def) => { try { return JSON.parse(localStorage.getItem(key) || 'null') || def; } catch(e) { return def; } },
-      set: (key, val) => localStorage.setItem(key, JSON.stringify(val)),
-      now: () => new Date().toISOString(),
-      id: () => Date.now().toString(36) + Math.random().toString(36).substr(2, 5)
-    };
-    const KEYS = { TEACHERS: 'ep_teachers', RECORDS: 'ep_records', PAYMENTS: 'ep_payments' };
-    function getTeachers() { return DB.get(KEYS.TEACHERS, []); }
-    function setTeachers(t) { DB.set(KEYS.TEACHERS, t); }
-    function getRecords() { return DB.get(KEYS.RECORDS, []); }
-    function setRecords(r) { DB.set(KEYS.RECORDS, r); }
-    function getPayments() { return DB.get(KEYS.PAYMENTS, []); }
-    function setPayments(p) { DB.set(KEYS.PAYMENTS, p); }
-    
-    // ===== UI UTILITIES =====
-    function $(id) { return document.getElementById(id); }
-    function showToast(msg, type) {
-      type = type || 'success';
-      const t = $('toast'), icon = $('toastIcon'), m = $('toastMsg');
-      m.textContent = msg;
-      icon.textContent = type === 'success' ? '✓' : type === 'warning' ? '!' : '✕';
-      t.className = 'toast ' + type + ' show';
-      setTimeout(() => t.classList.remove('show'), 2800);
-    }
-    function openSheet(html) {
-      $('sheetContent').innerHTML = html;
-      $('sheetOverlay').classList.add('active');
-      $('sheet').classList.add('active');
-    }
-    function closeSheet() {
-      $('sheet').classList.remove('active');
-      $('sheetOverlay').classList.remove('active');
-    }
-    function showScreen(id) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      $(id).classList.add('active');
-      window.scrollTo(0, 0);
-    }
-    function setNavActive(id) {
-      document.querySelectorAll('.bottom-nav-item').forEach(n => n.classList.remove('active'));
-      $(id).classList.add('active');
-    }
-    function formatCurrency(n) {
-      return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(n || 0);
-    }
-    function formatDate(d) {
-      if (!d) return '';
-      const date = new Date(d + 'T00:00:00');
-      return date.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' });
-    }
-    function formatMonthYear(d) {
-      if (!d) return '';
-      const date = new Date(d + 'T00:00:00');
-      return date.toLocaleDateString('es-CO', { month: 'long', year: 'numeric' });
-    }
-    function escapeHtml(s) {
-      const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML;
-    }
-    function parseMoney(v) {
-      const n = parseFloat(String(v).replace(/[^0-9.-]/g, ''));
-      return isNaN(n) ? 0 : Math.round(n);
-    }
-    function addMonths(dateStr, months) {
-      const d = new Date(dateStr + 'T00:00:00');
-      d.setMonth(d.getMonth() + months);
-      return d.toISOString().split('T')[0];
-    }
-    function todayStr() {
-      return new Date().toISOString().split('T')[0];
-    }
-    function getMonthName(dateStr) {
-      const d = new Date(dateStr + 'T00:00:00');
-      return d.toLocaleDateString('es-CO', { month: 'long' });
-    }
-    function copyToClipboard(text) {
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(text).then(() => showToast('Copiado al portapapeles'));
-      } else {
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-        showToast('Copiado al portapapeles');
-      }
-    }
-    
-    // ===== SERVICE WORKER =====
-    const swCode = `const CACHE='edu-descuentos-v3';self.addEventListener('install',e=>self.skipWaiting());self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(c=>c!==CACHE).map(c=>caches.delete(c))))));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{const c=res.clone();caches.open(CACHE).then(ca=>ca.put(e.request,c));return res;})).catch(()=>caches.match(e.request))));`;
-    const swBlob = new Blob([swCode], { type: 'application/javascript' });
-    const swUrl = URL.createObjectURL(swBlob);
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register(swUrl).catch(()=>{});
-    
-    // ===== RECORD TYPE LABELS =====
-    const RECORD_TYPES = {
-      prestamo: { label: 'Préstamo', icon: '💰', class: 'prestamo' },
-      descuento: { label: 'Descuento', icon: '📋', class: 'descuento' }
-    };
-    
-    // ===== CALCULATIONS =====
-    function getRecordPayments(recordId) {
-      return getPayments().filter(p => p.recordId === recordId).sort((a, b) => new Date(a.date) - new Date(b.date));
-    }
-    function getRecordBalance(record) {
-      const paid = getRecordPayments(record.id).reduce((s, p) => s + (p.amount || 0), 0);
-      return Math.max(0, (record.amount || 0) - paid);
-    }
-    function getTeacherPrestamoBalance(teacherId) {
-      return getRecords().filter(r => r.teacherId === teacherId && r.type === 'prestamo').reduce((s, r) => s + getRecordBalance(r), 0);
-    }
-    function getTeacherDescuentoBalance(teacherId) {
-      return getRecords().filter(r => r.teacherId === teacherId && r.type === 'descuento' && !r.deductFromLiquidation).reduce((s, r) => s + getRecordBalance(r), 0);
-    }
-    function getTeacherLiquidationBalance(teacherId) {
-      return getRecords().filter(r => r.teacherId === teacherId && r.type === 'descuento' && r.deductFromLiquidation).reduce((s, r) => s + getRecordBalance(r), 0);
-    }
-    function getTeacherTotalPrestamos(teacherId) {
-      return getRecords().filter(r => r.teacherId === teacherId && r.type === 'prestamo').reduce((s, r) => s + (r.amount || 0), 0);
-    }
-    function getTeacherTotalDescuentos(teacherId) {
-      return getRecords().filter(r => r.teacherId === teacherId && r.type === 'descuento').reduce((s, r) => s + (r.amount || 0), 0);
-    }
-    function getTeacherTotalPaid(teacherId) {
-      const recordIds = getRecords().filter(r => r.teacherId === teacherId).map(r => r.id);
-      return getPayments().filter(p => recordIds.includes(p.recordId)).reduce((s, p) => s + (p.amount || 0), 0);
-    }
-    
-    // ===== INSTALLMENT LOGIC =====
-    function generateInstallmentDates(record) {
-      if (!record.startDate || !record.installments || record.installments <= 0) return [];
-      const dates = [];
-      const start = new Date(record.startDate + 'T00:00:00');
-      const day = record.installmentDay || start.getDate();
-      for (let i = 0; i < record.installments; i++) {
-        const d = new Date(start);
-        d.setMonth(d.getMonth() + i);
-        d.setDate(Math.min(day, new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()));
-        dates.push(d.toISOString().split('T')[0]);
-      }
-      return dates;
-    }
-    function getInstallmentStatus(record) {
-      const payments = getRecordPayments(record.id);
-      const totalPaid = payments.reduce((s, p) => s + (p.amount || 0), 0);
-      const dates = generateInstallmentDates(record);
-      let paidCount = 0;
-      let nextIndex = -1;
-      dates.forEach((date, idx) => {
-        const cumulativeExpected = (idx + 1) * (record.installmentAmount || 0);
-        if (totalPaid >= cumulativeExpected) {
-          paidCount++;
-        } else if (nextIndex === -1) {
-          nextIndex = idx;
+<div id="overlay">
+  <div class="ov-ball">⚽</div>
+  <div class="ov-title">FootIQ · Mundial 2026</div>
+  <div class="ov-sub">Cargando motor de predicción y simulaciones</div>
+  <div class="ov-prog"><div class="ov-fill" id="progFill"></div></div>
+  <div class="ov-step" id="stepMsg">Iniciando...</div>
+</div>
+
+<div class="topbar">
+  <div class="logo">Foot<em>IQ</em></div>
+  <div class="spacer"></div>
+  <div class="score-pill" id="modelScore">—</div>
+  <div class="sdot" id="statusDot"></div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab(this,'champ')"><span class="ti">🏆</span>Campeón</div>
+  <div class="tab" onclick="showTab(this,'duel')"><span class="ti">⚔️</span>Duelo</div>
+  <div class="tab" onclick="showTab(this,'calendar')"><span class="ti">📅</span>Calendario</div>
+  <div class="tab" onclick="showTab(this,'groups')"><span class="ti">🏟️</span>Grupos</div>
+  <div class="tab" onclick="showTab(this,'model')"><span class="ti">🔬</span>Modelo</div>
+</div>
+
+<div class="pages">
+  <div class="page active" id="page-champ"></div>
+  <div class="page" id="page-duel"><div id="duelBody"></div></div>
+  <div class="page" id="page-calendar">
+    <div class="cal-header">
+      <div class="cal-nav" onclick="changeMonth(-1)">‹</div>
+      <div class="cal-title" id="calMonthTitle">Junio 2026</div>
+      <div class="cal-nav" onclick="changeMonth(1)">›</div>
+    </div>
+    <div class="cal-weekdays"><div>D</div><div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div></div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="cal-day-matches" id="calDayMatches">
+      <div class="card" style="text-align:center;color:var(--muted);">Selecciona un día del calendario</div>
+    </div>
+  </div>
+  <div class="page" id="page-groups"></div>
+  <div class="page" id="page-model"></div>
+</div>
+
+<script>
+// ==================== DATOS ====================
+const GRUPOS = {
+  A:['Mexico','South Korea','South Africa','Czechia'],
+  B:['Canada','Bosnia','Qatar','Switzerland'],
+  C:['Brazil','Morocco','Haiti','Scotland'],
+  D:['United States','Paraguay','Australia','Turkey'],
+  E:['Germany','Curaçao','Ivory Coast','Ecuador'],
+  F:['Netherlands','Japan','Sweden','Tunisia'],
+  G:['Belgium','Egypt','Iran','New Zealand'],
+  H:['Spain','Cape Verde','Saudi Arabia','Uruguay'],
+  I:['France','Senegal','Iraq','Norway'],
+  J:['Argentina','Algeria','Austria','Jordan'],
+  K:['Portugal','DR Congo','Uzbekistan','Colombia'],
+  L:['England','Croatia','Ghana','Panama']
+};
+const BANDERAS = {
+  'Mexico':'🇲🇽','South Korea':'🇰🇷','South Africa':'🇿🇦','Czechia':'🇨🇿',
+  'Canada':'🇨🇦','Bosnia':'🇧🇦','Qatar':'🇶🇦','Switzerland':'🇨🇭',
+  'Brazil':'🇧🇷','Morocco':'🇲🇦','Haiti':'🇭🇹','Scotland':'🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+  'United States':'🇺🇸','Paraguay':'🇵🇾','Australia':'🇦🇺','Turkey':'🇹🇷',
+  'Germany':'🇩🇪','Curaçao':'🇨🇼','Ivory Coast':'🇨🇮','Ecuador':'🇪🇨',
+  'Netherlands':'🇳🇱','Japan':'🇯🇵','Sweden':'🇸🇪','Tunisia':'🇹🇳',
+  'Belgium':'🇧🇪','Egypt':'🇪🇬','Iran':'🇮🇷','New Zealand':'🇳🇿',
+  'Spain':'🇪🇸','Cape Verde':'🇨🇻','Saudi Arabia':'🇸🇦','Uruguay':'🇺🇾',
+  'France':'🇫🇷','Senegal':'🇸🇳','Iraq':'🇮🇶','Norway':'🇳🇴',
+  'Argentina':'🇦🇷','Algeria':'🇩🇿','Austria':'🇦🇹','Jordan':'🇯🇴',
+  'Portugal':'🇵🇹','DR Congo':'🇨🇩','Uzbekistan':'🇺🇿','Colombia':'🇨🇴',
+  'England':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','Croatia':'🇭🇷','Ghana':'🇬🇭','Panama':'🇵🇦'
+};
+const FLAG = t => BANDERAS[t] || '🏳️';
+const ALL_TEAMS = Object.values(GRUPOS).flat();
+
+const MERCADO = {
+  'Spain':1980,'France':1970,'England':1930,'Brazil':1890,'Argentina':1880,
+  'Portugal':1860,'Germany':1860,'Netherlands':1780,'Belgium':1760,'Croatia':1710,
+  'Uruguay':1670,'Morocco':1640,'United States':1610,'Mexico':1580,'Switzerland':1610,
+  'Senegal':1530,'Japan':1530,'South Korea':1500,'Australia':1500,'Canada':1500,
+  'Ecuador':1500,'Colombia':1530,'Tunisia':1450,'Iran':1450,'Norway':1500,
+  'Sweden':1500,'Czechia':1450,'Bosnia':1400,'Qatar':1370,'South Africa':1330,
+  'Haiti':1330,'Scotland':1450,'Turkey':1530,'Curaçao':1230,'Ivory Coast':1450,
+  'Cape Verde':1330,'Saudi Arabia':1410,'Iraq':1330,'Algeria':1410,'Austria':1500,
+  'Jordan':1230,'DR Congo':1330,'Uzbekistan':1330,'Ghana':1410,'Panama':1330,
+  'New Zealand':1230,'Paraguay':1410,'Egypt':1450
+};
+const CHOKE = {'Germany':-80,'Belgium':-60,'Mexico':-50,'Spain':-30,'Portugal':-40,'Netherlands':-30};
+const DARK  = {'Spain':70,'Norway':60,'Austria':50,'Colombia':40,'Senegal':35,'Morocco':30,'United States':25,'Canada':20};
+
+// ==================== RESULTADOS REALES ====================
+const REAL_RESULTS = {
+  'Mexico-South Africa':      {h:2,a:0,played:true},
+  'South Korea-Czechia':      {h:2,a:1,played:true},
+  'Canada-Bosnia':            {h:1,a:1,played:true},
+  'United States-Paraguay':   {h:2,a:1,played:true},
+  'Qatar-Switzerland':        {h:0,a:2,played:true},
+  'Brazil-Morocco':           {h:3,a:0,played:true},
+  'Haiti-Scotland':           {h:0,a:2,played:true},
+  'Australia-Turkey':         {h:1,a:1,played:true},
+  'Germany-Curaçao':          {h:4,a:0,played:true},
+  'Netherlands-Japan':        {h:2,a:0,played:true}
+};
+
+// ==================== CALENDARIO (fixture real fase grupos + eliminatorias) ====================
+const CALENDAR_MATCHES = {
+  '2026-06-11':[{home:'Mexico',away:'South Africa',group:'A',time:'21:00'},{home:'South Korea',away:'Czechia',group:'A',time:'04:00'}],
+  '2026-06-12':[{home:'Canada',away:'Bosnia',group:'B',time:'21:00'},{home:'Brazil',away:'Morocco',group:'C',time:'15:00'}],
+  '2026-06-13':[{home:'United States',away:'Paraguay',group:'D',time:'03:00'},{home:'Qatar',away:'Switzerland',group:'B',time:'21:00'},{home:'Germany',away:'Curaçao',group:'E',time:'18:00'}],
+  '2026-06-14':[{home:'Haiti',away:'Scotland',group:'C',time:'03:00'},{home:'Australia',away:'Turkey',group:'D',time:'06:00'},{home:'Netherlands',away:'Japan',group:'F',time:'22:00'}],
+  '2026-06-15':[{home:'Spain',away:'Cape Verde',group:'H',time:'12:00'},{home:'Ivory Coast',away:'Ecuador',group:'E',time:'15:00'},{home:'France',away:'Senegal',group:'I',time:'18:00'}],
+  '2026-06-16':[{home:'Argentina',away:'Algeria',group:'J',time:'00:00'},{home:'Belgium',away:'Egypt',group:'G',time:'15:00'},{home:'Sweden',away:'Tunisia',group:'F',time:'18:00'}],
+  '2026-06-17':[{home:'Saudi Arabia',away:'Uruguay',group:'H',time:'03:00'},{home:'Portugal',away:'DR Congo',group:'K',time:'15:00'},{home:'England',away:'Croatia',group:'L',time:'18:00'}],
+  '2026-06-18':[{home:'Iraq',away:'Norway',group:'I',time:'03:00'},{home:'Austria',away:'Jordan',group:'J',time:'15:00'},{home:'Uzbekistan',away:'Colombia',group:'K',time:'18:00'}],
+  '2026-06-19':[{home:'Ghana',away:'Panama',group:'L',time:'00:00'},{home:'Iran',away:'New Zealand',group:'G',time:'15:00'},{home:'Mexico',away:'Czechia',group:'A',time:'21:00'}],
+  '2026-06-20':[{home:'South Africa',away:'South Korea',group:'A',time:'03:00'},{home:'Bosnia',away:'Qatar',group:'B',time:'15:00'},{home:'Canada',away:'Switzerland',group:'B',time:'18:00'}],
+  '2026-06-21':[{home:'Morocco',away:'Haiti',group:'C',time:'03:00'},{home:'Scotland',away:'Brazil',group:'C',time:'21:00'},{home:'Paraguay',away:'Australia',group:'D',time:'18:00'}],
+  '2026-06-22':[{home:'United States',away:'Turkey',group:'D',time:'03:00'},{home:'Curaçao',away:'Ivory Coast',group:'E',time:'15:00'},{home:'Germany',away:'Ecuador',group:'E',time:'21:00'}],
+  '2026-06-23':[{home:'Japan',away:'Sweden',group:'F',time:'03:00'},{home:'Netherlands',away:'Tunisia',group:'F',time:'21:00'},{home:'Egypt',away:'Iran',group:'G',time:'15:00'}],
+  '2026-06-24':[{home:'Belgium',away:'New Zealand',group:'G',time:'03:00'},{home:'Cape Verde',away:'Saudi Arabia',group:'H',time:'15:00'},{home:'Spain',away:'Uruguay',group:'H',time:'21:00'}],
+  '2026-06-25':[{home:'Senegal',away:'Iraq',group:'I',time:'03:00'},{home:'France',away:'Norway',group:'I',time:'21:00'},{home:'Algeria',away:'Austria',group:'J',time:'15:00'}],
+  '2026-06-26':[{home:'Argentina',away:'Jordan',group:'J',time:'03:00'},{home:'DR Congo',away:'Uzbekistan',group:'K',time:'15:00'},{home:'Portugal',away:'Colombia',group:'K',time:'21:00'}],
+  '2026-06-27':[{home:'Croatia',away:'Ghana',group:'L',time:'03:00'},{home:'England',away:'Panama',group:'L',time:'21:00'}],
+  // Eliminatorias (simplificadas)
+  '2026-07-04':[{home:'España (1A)',away:'Alemania (2F)',group:'R32',time:'16:00'}],
+  '2026-07-05':[{home:'Francia (1I)',away:'Portugal (1K)',group:'R32',time:'16:00'}],
+  '2026-07-09':[{home:'TBD',away:'TBD',group:'QF',time:'20:00'}],
+  '2026-07-14':[{home:'TBD',away:'TBD',group:'SF',time:'20:00'}],
+  '2026-07-18':[{home:'TBD',away:'TBD',group:'3er puesto',time:'15:00'}],
+  '2026-07-19':[{home:'TBD',away:'TBD',group:'Final',time:'15:00'}]
+};
+
+// ==================== MODELOS ====================
+let G = {elo:{}, mc:{}};
+let K_MC = {};
+let MODEL_SCORES = {actual:{points:0,cw:0,total:0}, klement:{points:0,cw:0,total:0}};
+
+// Calcula outcome real: 'H'=local gana, 'D'=empate, 'A'=visitante gana
+function realOutcome(r){ return r.h>r.a?'H':r.h===r.a?'D':'A'; }
+// Calcula outcome predicho por modelo: 'H', 'D' o 'A'
+function predOutcome(p){ if(p.pH>p.pD&&p.pH>p.pA)return'H'; if(p.pA>p.pH&&p.pA>p.pD)return'A'; return'D'; }
+
+function computeModelScores(){
+  MODEL_SCORES={actual:{points:0,cw:0,total:0},klement:{points:0,cw:0,total:0}};
+  for(let [key,real] of Object.entries(REAL_RESULTS)){
+    if(!real.played) continue;
+    const [h,a]=key.split('-');
+    const ro=realOutcome(real);
+    const pa=ensemblePredict(h,a), pk=klementPredict(h,a);
+    const oa=predOutcome(pa), ok=predOutcome(pk);
+    MODEL_SCORES.actual.total++;
+    MODEL_SCORES.klement.total++;
+    if(oa===ro){ MODEL_SCORES.actual.cw++; MODEL_SCORES.actual.points+=(ro==='D'?1:3); }
+    if(ok===ro){ MODEL_SCORES.klement.cw++; MODEL_SCORES.klement.points+=(ro==='D'?1:3); }
+  }
+}
+const todayStr = new Date().toISOString().slice(0,10);
+
+function initElo(){
+  ALL_TEAMS.forEach(t=>G.elo[t]=1500);
+  const R={'Argentina':1950,'France':1930,'Spain':1910,'England':1900,'Brazil':1880,'Portugal':1870,'Germany':1860,'Netherlands':1840,'Belgium':1820,'Croatia':1780,'Uruguay':1760,'Morocco':1740,'United States':1720,'Mexico':1700,'Japan':1680,'Senegal':1660,'Australia':1650,'Canada':1640,'Ecuador':1630,'Colombia':1650,'Norway':1670,'Sweden':1650,'Turkey':1660,'Scotland':1640,'Austria':1680,'Czechia':1620,'Bosnia':1580,'Qatar':1550,'South Africa':1520,'Haiti':1480,'Curaçao':1450,'Ivory Coast':1620,'Cape Verde':1500,'Saudi Arabia':1580,'Iraq':1500,'Algeria':1600,'Jordan':1480,'DR Congo':1500,'Uzbekistan':1480,'Ghana':1600,'Panama':1500,'New Zealand':1450,'Paraguay':1580,'Egypt':1620,'Tunisia':1600,'Iran':1600,'South Korea':1650,'Switzerland':1700};
+  for(let t in R) if(G.elo[t]!==undefined) G.elo[t]=R[t];
+}
+
+function klementStrength(t,isHome){
+  const GDP={'Qatar':83500,'Switzerland':72000,'Norway':78000,'United States':76000,'Germany':54000,'France':48000,'Japan':40000,'South Korea':35000,'Spain':32000,'Czechia':28000,'Portugal':25000,'Saudi Arabia':23000,'Croatia':18000,'Mexico':11000,'Turkey':11000,'Argentina':14000,'Brazil':9000,'South Africa':7000,'Egypt':4000,'Morocco':4000,'Ghana':2500,'Senegal':1700,'Ivory Coast':2600,'Tunisia':4000,'Algeria':4000,'Iran':5000,'Iraq':5000,'Jordan':4500,'Uzbekistan':2000,'New Zealand':48000,'Ecuador':6500,'Paraguay':6000,'Colombia':7000,'Panama':18000,'Haiti':1800,'Curaçao':25000,'Cape Verde':4000,'DR Congo':600,'Bosnia':7000,'Scotland':48000,'Austria':56000,'Netherlands':58000,'Belgium':53000,'Canada':52000,'Australia':60000,'Sweden':50000,'Uruguay':17000,'England':47000};
+  const POP={'United States':335,'Brazil':215,'Mexico':130,'Japan':125,'Egypt':110,'Turkey':85,'Iran':87,'Germany':84,'France':68,'South Africa':60,'South Korea':52,'Colombia':52,'Spain':48,'Argentina':46,'Algeria':45,'Iraq':44,'Canada':39,'Morocco':37,'Saudi Arabia':36,'Uzbekistan':35,'Ghana':33,'Australia':26,'Senegal':17,'Tunisia':12,'Belgium':12,'Haiti':12,'Czechia':11,'Portugal':10,'Sweden':10,'Austria':9,'Switzerland':9,'Paraguay':7,'Croatia':4,'Uruguay':3,'Qatar':3,'Norway':5,'Netherlands':17,'New Zealand':5,'Panama':4,'Jordan':10,'Cape Verde':0.6,'Curaçao':0.16,'DR Congo':95,'Ivory Coast':26,'Ecuador':18,'Scotland':5,'Bosnia':3,'England':56};
+  const RANK={'Argentina':1,'France':2,'Spain':3,'England':4,'Brazil':5,'Portugal':6,'Netherlands':7,'Belgium':8,'Germany':9,'Croatia':10,'Uruguay':12,'Morocco':13,'Colombia':14,'Switzerland':15,'United States':16,'Mexico':17,'Japan':18,'Senegal':19,'Australia':21,'Iran':22,'South Korea':23,'Austria':25,'Sweden':27,'Czechia':29,'Turkey':30,'Scotland':32,'Norway':34,'Egypt':35,'Ecuador':38,'Tunisia':39,'Algeria':40,'Saudi Arabia':43,'Paraguay':45,'Ghana':46,'Ivory Coast':47,'Panama':48,'Bosnia':51,'Canada':66,'New Zealand':67,'South Africa':68,'Iraq':69,'Jordan':70,'Qatar':74,'Uzbekistan':99,'DR Congo':113,'Cape Verde':130,'Haiti':133,'Curaçao':150};
+  const INFRA={'Germany':95,'England':95,'Spain':93,'France':92,'Brazil':85,'Argentina':82,'Netherlands':88,'Portugal':85,'Belgium':87,'Mexico':78,'United States':84,'Japan':80,'South Korea':78,'Uruguay':75,'Croatia':76,'Switzerland':82,'Austria':80,'Turkey':75,'Sweden':79,'Norway':78,'Colombia':72,'Ecuador':65,'Paraguay':60,'Australia':78,'Iran':55,'Saudi Arabia':65,'Egypt':60,'Morocco':68,'Tunisia':58,'Senegal':62,'Ghana':58,'Ivory Coast':60,'Algeria':58,'South Africa':65,'Canada':72,'Panama':50,'Qatar':75,'Iraq':40,'Jordan':45,'Uzbekistan':42,'New Zealand':60,'Czechia':78,'Scotland':75,'Bosnia':55,'DR Congo':35,'Cape Verde':38,'Haiti':35,'Curaçao':40};
+  const WC={'Brazil':22,'Germany':20,'Argentina':18,'Mexico':17,'France':16,'Spain':16,'England':16,'Uruguay':14,'Belgium':14,'Switzerland':12,'Sweden':12,'Netherlands':11,'Portugal':8,'United States':11,'South Korea':10,'Japan':7,'Iran':6,'Saudi Arabia':6,'Australia':6,'Ghana':4,'Morocco':6,'Tunisia':6,'Algeria':4,'South Africa':3,'Egypt':3,'Senegal':3,'Ivory Coast':3,'Ecuador':4,'Colombia':6,'Canada':2,'Panama':1,'Norway':3,'Scotland':8,'Turkey':2,'Croatia':6,'Bosnia':1,'Qatar':1,'Iraq':1,'Jordan':1,'New Zealand':2,'DR Congo':1,'Haiti':1};
+  const gdp=GDP[t]||12000, pop=POP[t]||5, rank=RANK[t]||100, infra=INFRA[t]||45, wc=WC[t]||0;
+  const s=(Math.log(gdp)*0.22+Math.log(pop*1e6)*0.15+0.12+(1/Math.sqrt(rank))*0.28+(infra/100)*0.13+Math.min(1,Math.sqrt(wc)/5)*0.10)*(isHome?1.12:1);
+  return s;
+}
+function klementPredict(h,a){
+  let sh=klementStrength(h,1),sa=klementStrength(a,0),diff=sh-sa;
+  let pH=1/(1+Math.exp(-diff*2.5)),pA=1-pH;
+  pH=pH*0.55+0.33*0.45; pA=pA*0.55+0.33*0.45;
+  let pD=Math.max(0.02,1-pH-pA),tot=pH+pD+pA;
+  pH/=tot; pD/=tot; pA/=tot;
+  // Normalizar xG a rango realista (0.5–2.5) usando sigmoid sobre la fuerza relativa
+  let base=1.2,xgH=Math.max(0.4,Math.min(2.5,base+(sh-sa)*0.4)),xgA=Math.max(0.4,Math.min(2.5,base+(sa-sh)*0.4));
+  return {pH,pD,pA,xgH:xgH.toFixed(2),xgA:xgA.toFixed(2),score:Math.round(xgH)+'-'+Math.round(xgA)};
+}
+function eloPredict(h,a){
+  let eh=G.elo[h]||1500,ea=G.elo[a]||1500;
+  let expH=1/(1+Math.pow(10,(ea-eh)/400));
+  return {pH:expH*0.74,pD:0.26,pA:(1-expH)*0.74};
+}
+function marketProb(h,a){
+  let mh=MERCADO[h]||1500,ma=MERCADO[a]||1500,diff=(mh-ma)/400;
+  let expH=1/(1+Math.pow(10,-diff));
+  return {pH:expH*0.745,pD:0.255,pA:(1-expH)*0.745};
+}
+function ensemblePredict(h,a){
+  let el=eloPredict(h,a),mk=marketProb(h,a);
+  let pH=(el.pH+mk.pH)/2,pD=(el.pD+mk.pD)/2,pA=(el.pA+mk.pA)/2;
+  let tot=pH+pD+pA;
+  return {pH:pH/tot,pD:pD/tot,pA:pA/tot,score:pH>pA?'1-0':'0-1',xgH:'1.2',xgA:'1.0'};
+}
+
+// ==================== MONTE CARLO ASÍNCRONO ====================
+async function runMC(N,modelo,cb){
+  let champ={}; ALL_TEAMS.forEach(t=>champ[t]=0);
+  for(let start=0;start<N;start+=500){
+    let end=Math.min(start+500,N);
+    for(let sim=start;sim<end;sim++){
+      let adv=[],terceros=[];
+      for(let [g,eqs] of Object.entries(GRUPOS)){
+        let pts={}; eqs.forEach(e=>pts[e]=0);
+        for(let i=0;i<eqs.length;i++) for(let j=i+1;j<eqs.length;j++){
+          let r=Math.random(),w=null;
+          let p=modelo==='klement'?klementPredict(eqs[i],eqs[j]):ensemblePredict(eqs[i],eqs[j]);
+          if(r<p.pH)w=eqs[i]; else if(r<p.pH+p.pD)w=null; else w=eqs[j];
+          if(w===eqs[i])pts[eqs[i]]+=3; else if(w===eqs[j])pts[eqs[j]]+=3; else{pts[eqs[i]]+=1;pts[eqs[j]]+=1;}
         }
-      });
-      if (nextIndex === -1 && paidCount < dates.length) nextIndex = paidCount;
-      return { dates, paidCount, totalPaid, nextIndex, remaining: dates.length - paidCount };
-    }
-    function getMonthDeductions(teacherId, year, month) {
-      const records = getRecords().filter(r => r.teacherId === teacherId && r.type === 'descuento' && r.status !== 'paid' && !r.deductFromLiquidation);
-      let total = 0;
-      const details = [];
-      records.forEach(r => {
-        const status = getInstallmentStatus(r);
-        status.dates.forEach((date, idx) => {
-          if (idx < status.paidCount) return;
-          const d = new Date(date + 'T00:00:00');
-          if (d.getFullYear() === year && d.getMonth() === month) {
-            total += r.installmentAmount || 0;
-            details.push({ record: r, date, installmentNumber: idx + 1, amount: r.installmentAmount || 0 });
-          }
-        });
-      });
-      return { total, details };
-    }
-    function getLiquidationRecords() {
-      return getRecords().filter(r => r.type === 'descuento' && r.deductFromLiquidation && r.status !== 'paid');
-    }
-    function getLiquidationTotal() {
-      return getLiquidationRecords().reduce((s, r) => s + getRecordBalance(r), 0);
-    }
-    
-    // ===== DASHBOARD =====
-    function renderDashboard() {
-      const teachers = getTeachers();
-      const records = getRecords();
-      const payments = getPayments();
-      const totalPrestamos = records.filter(r => r.type === 'prestamo').reduce((s, r) => s + getRecordBalance(r), 0);
-      const totalDescuentos = records.filter(r => r.type === 'descuento' && !r.deductFromLiquidation).reduce((s, r) => s + getRecordBalance(r), 0);
-      const totalLiquidacion = getLiquidationTotal();
-      const totalPending = totalPrestamos + totalDescuentos + totalLiquidacion;
-      $('statTotalPrestamos').textContent = formatCurrency(totalPrestamos);
-      $('statTotalDescuentos').textContent = formatCurrency(totalDescuentos);
-      $('statTotalPending').textContent = formatCurrency(totalPending);
-      $('statLiquidacion').textContent = formatCurrency(totalLiquidacion);
-      
-      // Liquidation alerts (show in Nov, Dec, Jan)
-      const now = new Date();
-      const currentMonth = now.getMonth();
-      const alertDiv = $('liquidationAlerts');
-      const liqRecords = getLiquidationRecords();
-      if ((currentMonth >= 10 || currentMonth <= 0) && liqRecords.length > 0) {
-        const liqByTeacher = {};
-        liqRecords.forEach(r => {
-          if (!liqByTeacher[r.teacherId]) liqByTeacher[r.teacherId] = 0;
-          liqByTeacher[r.teacherId] += getRecordBalance(r);
-        });
-        let alertHtml = `<div class="section-title">⚠️ Alertas de liquidación</div>`;
-        Object.entries(liqByTeacher).forEach(([tid, amount]) => {
-          const teacher = teachers.find(t => t.id === tid);
-          if (teacher) {
-            alertHtml += `
-              <div class="alert-card animate-fade" onclick="showTeacherDetail('${tid}')">
-                <div class="alert-card-header">
-                  <div class="alert-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
-                  <div class="alert-title">${escapeHtml(teacher.name)}</div>
-                </div>
-                <div class="alert-text">Tiene descuentos pendientes para descontar de la liquidación</div>
-                <div class="alert-amount">${formatCurrency(amount)}</div>
-              </div>`;
-          }
-        });
-        alertDiv.innerHTML = alertHtml;
-      } else {
-        alertDiv.innerHTML = '';
+        let ord=Object.entries(pts).sort((a,b)=>b[1]-a[1]).map(x=>x[0]);
+        adv.push(ord[0],ord[1]); terceros.push({t:ord[2],pts:pts[ord[2]]||0});
       }
-      
-      const list = $('teachersList');
-      if (teachers.length === 0) {
-        list.innerHTML = `
-          <div class="empty-state animate-fade">
-            <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-            <div class="empty-title">No hay docentes</div>
-            <div class="empty-text">Agrega docentes para comenzar a registrar préstamos y descuentos.</div>
-          </div>`;
-        return;
-      }
-      list.innerHTML = teachers.map((t, i) => {
-        const prestamoBal = getTeacherPrestamoBalance(t.id);
-        const descuentoBal = getTeacherDescuentoBalance(t.id);
-        const liqBal = getTeacherLiquidationBalance(t.id);
-        const totalBal = prestamoBal + descuentoBal + liqBal;
-        const initials = (t.name || '').split(' ').map(w => w[0]).join('').substr(0, 2).toUpperCase();
-        return `
-          <div class="list-item animate-fade stagger-${Math.min(i+1, 5)}" onclick="showTeacherDetail('${t.id}')">
-            <div class="list-avatar">${escapeHtml(initials)}</div>
-            <div class="list-content">
-              <div class="list-title">${escapeHtml(t.name)}</div>
-              <div class="list-subtitle">${prestamoBal > 0 ? 'Préstamo: ' + formatCurrency(prestamoBal) : ''}${descuentoBal > 0 ? ' · Descuento: ' + formatCurrency(descuentoBal) : ''}${liqBal > 0 ? ' · Liq: ' + formatCurrency(liqBal) : ''}</div>
-            </div>
-            <div class="list-meta">
-              <div class="list-amount ${totalBal > 0 ? 'negative' : 'positive'}">${formatCurrency(totalBal)}</div>
-              <div class="list-badge ${totalBal > 0 ? 'badge-warning' : 'badge-success'}">${totalBal > 0 ? 'Pendiente' : 'Al día'}</div>
-            </div>
-          </div>`;
-      }).join('');
-    }
-    
-    // ===== LIQUIDATION SCREEN =====
-    function renderLiquidation() {
-      const records = getLiquidationRecords();
-      const teachers = getTeachers();
-      const content = $('liquidationContent');
-      if (records.length === 0) {
-        content.innerHTML = `
-          <div class="empty-state animate-fade">
-            <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-            <div class="empty-title">Sin descuentos de liquidación</div>
-            <div class="empty-text">No hay descuentos marcados para descontar de la liquidación final.</div>
-          </div>`;
-        return;
-      }
-      const byTeacher = {};
-      records.forEach(r => {
-        if (!byTeacher[r.teacherId]) byTeacher[r.teacherId] = [];
-        byTeacher[r.teacherId].push(r);
-      });
-      let html = `<div class="section-title">Descuentos de liquidación</div>`;
-      Object.entries(byTeacher).forEach(([tid, recs]) => {
-        const teacher = teachers.find(t => t.id === tid);
-        if (!teacher) return;
-        const total = recs.reduce((s, r) => s + getRecordBalance(r), 0);
-        html += `
-          <div class="dashboard-card animate-fade">
-            <div class="dashboard-card-header">
-              <div>
-                <div class="dashboard-card-title">${escapeHtml(teacher.name)}</div>
-                <div class="dashboard-card-subtitle">${teacher.role || 'Docente'}</div>
-              </div>
-              <div class="list-amount negative">${formatCurrency(total)}</div>
-            </div>`;
-        recs.forEach(r => {
-          const bal = getRecordBalance(r);
-          html += `
-            <div class="condition-row" onclick="showRecordDetail('${r.id}')" style="cursor:pointer;">
-              <span class="condition-label">${escapeHtml(r.concept || 'Sin concepto')}</span>
-              <span class="condition-value">${formatCurrency(bal)} / ${formatCurrency(r.amount)}</span>
-            </div>`;
-        });
-        html += `</div>`;
-      });
-      content.innerHTML = html;
-    }
-    
-    // ===== MONTH PAYROLL SHEET =====
-    function openSheetMonthPayroll() {
-      const now = new Date();
-      const monthName = now.toLocaleDateString('es-CO', { month: 'long', year: 'numeric' });
-      const teachers = getTeachers();
-      let totalDeductions = 0;
-      let totalNet = 0;
-      
-      const rows = teachers.map(t => {
-        const ded = getMonthDeductions(t.id, now.getFullYear(), now.getMonth());
-        const net = (t.salary || 0) - ded.total;
-        totalDeductions += ded.total;
-        totalNet += net;
-        if (ded.total === 0) return '';
-        return `
-          <div class="payroll-teacher-card animate-fade">
-            <div class="payroll-teacher-header">
-              <div class="payroll-teacher-name">${escapeHtml(t.name)}</div>
-              <div class="payroll-teacher-net">${formatCurrency(net)}</div>
-            </div>
-            <div class="payroll-teacher-detail">Salario: ${formatCurrency(t.salary)} · Descuento: <span>${formatCurrency(ded.total)}</span></div>
-            <div style="margin-top:8px;font-size:12px;color:var(--text-muted);">
-              ${ded.details.map(d => `Cuota ${d.installmentNumber} · ${formatDate(d.date)} · ${formatCurrency(d.amount)}`).join('<br>')}
-            </div>
-          </div>`;
-      }).join('');
-      
-      openSheet(`
-        <div class="sheet-title">Nómina de ${monthName}</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;">
-          <div class="installment-summary-item"><div class="installment-summary-value" style="color:var(--text-primary)">${teachers.length}</div><div class="installment-summary-label">Docentes</div></div>
-          <div class="installment-summary-item"><div class="installment-summary-value" style="color:var(--danger)">${formatCurrency(totalDeductions)}</div><div class="installment-summary-label">Descuentos</div></div>
-          <div class="installment-summary-item"><div class="installment-summary-value" style="color:var(--success)">${formatCurrency(totalNet)}</div><div class="installment-summary-label">Total a pagar</div></div>
-        </div>
-        ${rows || '<div class="empty-state" style="padding:30px 0;"><div class="empty-text">No hay descuentos programados para este mes</div></div>'}
-      `);
-    }
-    
-    // ===== TEACHER DETAIL =====
-    let currentTeacherId = null;
-    let currentRecordId = null;
-    let teacherDetailTab = 'descuentos';
-    function showTeacherDetail(id) {
-      currentTeacherId = id;
-      teacherDetailTab = 'descuentos';
-      renderTeacherDetail();
-      showScreen('screenTeacher');
-      setNavActive('navDashboard');
-    }
-    function renderTeacherDetail() {
-      const teacher = getTeachers().find(t => t.id === currentTeacherId);
-      if (!teacher) return showScreen('screenDashboard');
-      const prestamoBal = getTeacherPrestamoBalance(teacher.id);
-      const descuentoBal = getTeacherDescuentoBalance(teacher.id);
-      const liqBal = getTeacherLiquidationBalance(teacher.id);
-      const totalPaid = getTeacherTotalPaid(teacher.id);
-      const initials = (teacher.name || '').split(' ').map(w => w[0]).join('').substr(0, 2).toUpperCase();
-      const allRecords = getRecords().filter(r => r.teacherId === teacher.id).sort((a, b) => new Date(b.date) - new Date(a.date));
-      const descuentos = allRecords.filter(r => r.type === 'descuento');
-      const prestamos = allRecords.filter(r => r.type === 'prestamo');
-      const allRecordIds = allRecords.map(r => r.id);
-      const allPayments = getPayments().filter(p => allRecordIds.includes(p.recordId)).sort((a, b) => new Date(b.date) - new Date(a.date));
-      
-      // Month payroll for this teacher
-      const now = new Date();
-      const monthDed = getMonthDeductions(teacher.id, now.getFullYear(), now.getMonth());
-      const monthName = now.toLocaleDateString('es-CO', { month: 'long' });
-      
-      let content = `
-        <div class="detail-header animate-fade">
-          <div class="detail-avatar">${escapeHtml(initials)}</div>
-          <div class="detail-name">${escapeHtml(teacher.name)}</div>
-          <div class="detail-role">${escapeHtml(teacher.role || 'Docente')}</div>
-          <div class="detail-salary">Salario: <strong>${formatCurrency(teacher.salary)}</strong></div>
-        </div>`;
-      
-      // This month payroll card
-      content += `
-        <div class="payroll-card animate-fade stagger-1">
-          <div class="payroll-title">${monthName} — Resumen de nómina</div>
-          <div class="payroll-row"><span class="payroll-label">Salario bruto</span><span class="payroll-value">${formatCurrency(teacher.salary)}</span></div>
-          <div class="payroll-row"><span class="payroll-label">Descuentos este mes</span><span class="payroll-value deduction">-${formatCurrency(monthDed.total)}</span></div>
-          ${monthDed.details.length > 0 ? `<div style="font-size:12px;color:var(--text-muted);margin:4px 0 8px;padding-left:8px;">${monthDed.details.map(d => `• Cuota ${d.installmentNumber} de ${escapeHtml(d.record.concept || 'descuento')}: ${formatCurrency(d.amount)}`).join('<br>')}</div>` : ''}
-          <div class="payroll-total"><span class="payroll-label" style="font-size:15px;">A pagar este mes</span><span class="payroll-value net">${formatCurrency((teacher.salary || 0) - monthDed.total)}</span></div>
-        </div>
-        
-        <div style="padding:0 20px 16px;">
-          <button class="copy-btn" onclick="copyTeacherSummary('${teacher.id}')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            Copiar resumen para el docente
-          </button>
-        </div>
-        
-        <div class="detail-stats animate-fade stagger-2">
-          <div class="detail-stat"><div class="detail-stat-value" style="color:var(--info)">${formatCurrency(prestamoBal)}</div><div class="detail-stat-label">Préstamos</div></div>
-          <div class="detail-stat"><div class="detail-stat-value" style="color:var(--warning)">${formatCurrency(descuentoBal)}</div><div class="detail-stat-label">Descuentos</div></div>
-          <div class="detail-stat"><div class="detail-stat-value" style="color:${liqBal > 0 ? 'var(--danger)' : 'var(--success)'}">${formatCurrency(liqBal)}</div><div class="detail-stat-label">Liquidación</div></div>
-        </div>
-        <div class="tabs animate-fade stagger-3">
-          <button class="tab ${teacherDetailTab === 'descuentos' ? 'active' : ''}" onclick="teacherDetailTab='descuentos';renderTeacherDetail();">Descuentos</button>
-          <button class="tab ${teacherDetailTab === 'prestamos' ? 'active' : ''}" onclick="teacherDetailTab='prestamos';renderTeacherDetail();">Préstamos</button>
-          <button class="tab ${teacherDetailTab === 'history' ? 'active' : ''}" onclick="teacherDetailTab='history';renderTeacherDetail();">Historial</button>
-        </div>
-        <div class="content" style="padding-top:8px;">`;
-      
-      if (teacherDetailTab === 'descuentos') {
-        const items = descuentos.filter(r => !r.deductFromLiquidation);
-        if (items.length === 0) {
-          content += `
-            <div class="empty-state animate-fade">
-              <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
-              <div class="empty-title">Sin descuentos</div>
-              <div class="empty-text">Este docente no tiene descuentos de nómina activos.</div>
-            </div>`;
-        } else {
-          content += items.map((r, i) => renderRecordCard(r, i)).join('');
+      terceros.sort((a,b)=>b.pts-a.pts);
+      adv.push(...terceros.slice(0,8).map(x=>x.t));
+      let bracket=adv.map(t=>({t,s:(G.elo[t]||1500)+(MERCADO[t]||1500)+(CHOKE[t]||0)+(DARK[t]||0)+Math.random()*250})).sort((a,b)=>b.s-a.s);
+      while(bracket.length>1){
+        let next=[];
+        for(let i=0;i<bracket.length;i+=2){
+          let t1=bracket[i].t,t2=bracket[i+1]?.t||bracket[i].t;
+          let p=modelo==='klement'?klementPredict(t1,t2):ensemblePredict(t1,t2);
+          let r2=Math.random(),w;
+          if(r2<p.pH)w=t1; else if(r2<p.pH+p.pD){let pen=0.5+(G.elo[t1]||1500-(G.elo[t2]||1500))/2000;w=Math.random()<pen?t1:t2;} else w=t2;
+          next.push({t:w,s:Math.random()});
         }
-      } else if (teacherDetailTab === 'prestamos') {
-        if (prestamos.length === 0) {
-          content += `
-            <div class="empty-state animate-fade">
-              <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-              <div class="empty-title">Sin préstamos</div>
-              <div class="empty-text">Este docente no tiene préstamos registrados.</div>
-            </div>`;
-        } else {
-          content += prestamos.map((r, i) => renderRecordCard(r, i)).join('');
-        }
-      } else {
-        if (allPayments.length === 0) {
-          content += `
-            <div class="empty-state animate-fade">
-              <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-              <div class="empty-title">Sin movimientos</div>
-              <div class="empty-text">No hay abonos ni descuentos registrados.</div>
-            </div>`;
-        } else {
-          content += allPayments.map((p, i) => {
-            const record = allRecords.find(r => r.id === p.recordId);
-            return `
-              <div class="timeline-item animate-fade stagger-${Math.min(i+1, 5)}">
-                <div class="timeline-dot ${p.type === 'installment' ? 'installment' : p.type === 'liquidation' ? 'liquidation' : 'payment'}">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    ${p.type === 'installment' ? '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>' : p.type === 'liquidation' ? '<path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>' : '<polyline points="20 6 9 17 4 12"/>'}
-                  </svg>
-                </div>
-                <div class="timeline-content">
-                  <div class="timeline-title">${p.type === 'installment' ? 'Descuento cuota #' + (p.installmentNumber || '') : p.type === 'liquidation' ? 'Descuento de liquidación' : 'Abono'}</div>
-                  <div class="timeline-desc">${record ? (RECORD_TYPES[record.type] || RECORD_TYPES.descuento).label + ': ' + escapeHtml(record.concept || '') : ''}</div>
-                  <div class="timeline-date">${formatDate(p.date)}${p.notes ? ' · ' + escapeHtml(p.notes) : ''}</div>
-                </div>
-                <div class="timeline-amount positive">${formatCurrency(p.amount)}</div>
-              </div>`;
-          }).join('');
-        }
+        bracket=next;
       }
-      content += `</div>`;
-      $('teacherDetailContent').innerHTML = content;
+      if(bracket[0])champ[bracket[0].t]=(champ[bracket[0].t]||0)+1;
     }
-    
-    function renderRecordCard(r, i) {
-      const bal = getRecordBalance(r);
-      const pct = r.amount > 0 ? ((r.amount - bal) / r.amount * 100) : 0;
-      const status = bal <= 0 ? 'paid' : 'active';
-      const typeInfo = RECORD_TYPES[r.type] || RECORD_TYPES.descuento;
-      const instStatus = r.type === 'descuento' && r.installments > 0 ? getInstallmentStatus(r) : null;
-      return `
-        <div class="loan-card animate-fade stagger-${Math.min(i+1, 5)}" onclick="showRecordDetail('${r.id}')">
-          <div class="loan-card-header">
-            <div>
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <span class="type-badge ${typeInfo.class}">${typeInfo.icon} ${typeInfo.label}</span>
-                ${r.deductFromLiquidation ? '<span class="badge-liquidation">Liquidación</span>' : ''}
-              </div>
-              <div style="font-size:14px;font-weight:500;margin-bottom:2px;">${escapeHtml(r.concept || '')}</div>
-              <div class="loan-card-date">${formatDate(r.date)}</div>
-            </div>
-            <div class="list-badge ${status === 'paid' ? 'badge-success' : 'badge-warning'}">${status === 'paid' ? 'Completado' : 'Activo'}</div>
+    let pct=Math.round(end/N*100);
+    setProgress(modelo==='actual'?20+pct*0.3:60+pct*0.3,`${modelo==='actual'?'Modelo Actual':'Klement'}: ${end}/${N}`);
+    await new Promise(r=>setTimeout(r,10));
+  }
+  let res={}; ALL_TEAMS.forEach(t=>res[t]=+((champ[t]||0)/N*100).toFixed(2));
+  cb(res);
+}
+
+// ==================== RENDERIZADO ====================
+function renderChamp(){
+  let act=ALL_TEAMS.map(t=>({t,f:FLAG(t),p:G.mc[t]||0})).sort((a,b)=>b.p-a.p);
+  let kl=ALL_TEAMS.map(t=>({t,f:FLAG(t),p:K_MC[t]||0})).sort((a,b)=>b.p-a.p);
+  document.getElementById('page-champ').innerHTML=`
+    <div class="champ-wrap"><div class="champ-flag">${act[0].f}</div><div class="champ-name">${act[0].t}</div><div class="champ-pct">${act[0].p}%</div><div style="font-size:10px;color:var(--muted)">Modelo Actual</div></div>
+    <div class="stitle">📈 Top 10 — Modelo Actual</div>
+    <div class="card">${act.slice(0,10).map(x=>`<div class="trow"><div class="tflg">${x.f}</div><div class="tname">${x.t}</div><div class="tpct">${x.p}%</div></div>`).join('')}</div>
+    <div class="champ-wrap" style="border:1px solid var(--orange)"><div class="champ-flag">${kl[0].f}</div><div class="champ-name">${kl[0].t}</div><div class="champ-pct" style="color:var(--orange)">${kl[0].p}%</div><div style="font-size:10px;color:var(--muted)">Modelo Klement</div></div>
+    <div class="stitle">🧮 Top 10 — Klement</div>
+    <div class="card">${kl.slice(0,10).map(x=>`<div class="trow"><div class="tflg">${x.f}</div><div class="tname">${x.t}</div><div class="tpct" style="color:var(--orange)">${x.p}%</div></div>`).join('')}</div>`;
+}
+function renderGroups(){
+  let html='';
+  for(let [g,eqs] of Object.entries(GRUPOS))
+    html+=`<div class="grp-card"><div class="grp-head">Grupo ${g}</div>${eqs.map(e=>`<div class="grp-team"><div class="tflg">${FLAG(e)}</div><div class="tname">${e}</div><span class="pill pg">${G.mc[e]?.toFixed(1)||0}%</span></div>`).join('')}</div>`;
+  document.getElementById('page-groups').innerHTML=html;
+}
+function renderDuel(){
+  computeModelScores();
+  const ms=MODEL_SCORES;
+  const aAcc=(ms.actual.cw/Math.max(1,ms.actual.total)*100).toFixed(0);
+  const kAcc=(ms.klement.cw/Math.max(1,ms.klement.total)*100).toFixed(0);
+  const aWins=ms.actual.points>ms.klement.points?'🏆':'';
+  const kWins=ms.klement.points>ms.actual.points?'🏆':'';
+
+  // Historial partido a partido
+  let histHtml='';
+  for(let [key,real] of Object.entries(REAL_RESULTS)){
+    if(!real.played) continue;
+    const [h,a]=key.split('-');
+    const ro=realOutcome(real);
+    const pa=ensemblePredict(h,a), pk=klementPredict(h,a);
+    const oa=predOutcome(pa), ok=predOutcome(pk);
+    const roLabel=ro==='H'?h:ro==='A'?a:'Empate';
+    const aOk=oa===ro, kOk=ok===ro;
+    histHtml+=`<div class="trow" style="font-size:10px">
+      <div style="flex:1">${FLAG(h)}${h} ${real.h}–${real.a} ${a}${FLAG(a)}</div>
+      <div style="width:28px;text-align:center">${aOk?'✅':'❌'}</div>
+      <div style="width:28px;text-align:center">${kOk?'✅':'❌'}</div>
+    </div>`;
+  }
+
+  document.getElementById('duelBody').innerHTML=`
+    <div class="ld-board">
+      <div class="ld-card" style="${ms.actual.points>=ms.klement.points?'border-color:var(--accent)':''}">
+        <div class="ld-name">Modelo Actual ${aWins}</div>
+        <div class="ld-score" style="color:var(--accent)">${ms.actual.points}</div>
+        <div class="ld-detail">${ms.actual.cw}/${ms.actual.total} partidos · ${aAcc}%</div>
+      </div>
+      <div class="ld-card" style="${ms.klement.points>=ms.actual.points?'border-color:var(--orange)':''}">
+        <div class="ld-name">Klement ${kWins}</div>
+        <div class="ld-score" style="color:var(--orange)">${ms.klement.points}</div>
+        <div class="ld-detail">${ms.klement.cw}/${ms.klement.total} partidos · ${kAcc}%</div>
+      </div>
+    </div>
+    <div class="stitle" style="margin-top:4px">📋 Historial (3pts=acierto ganador, 1pt=empate)</div>
+    <div class="card" style="padding:6px 10px">
+      <div class="trow" style="font-size:9px;color:var(--muted)">
+        <div style="flex:1">Partido</div>
+        <div style="width:28px;text-align:center">Actual</div>
+        <div style="width:28px;text-align:center">Klem.</div>
+      </div>
+      ${histHtml||'<div style="color:var(--muted);font-size:11px;padding:8px">Sin resultados aún</div>'}
+    </div>`;
+}
+function renderModel(){
+  document.getElementById('page-model').innerHTML=`
+    <div class="card">
+      <div class="stitle">⚙️ Parámetros del Motor</div>
+      <div class="trow"><span>Peso ELO</span><span style="color:var(--accent)">50%</span></div>
+      <div class="trow"><span>Peso Mercado</span><span style="color:var(--accent)">50%</span></div>
+      <div class="trow"><span>Simulaciones Monte Carlo</span><span style="color:var(--gold)">20.000 c/u</span></div>
+      <div class="trow"><span>Equipos totales</span><span>${ALL_TEAMS.length}</span></div>
+    </div>
+    <div class="card">
+      <div class="stitle">🧮 Klement — Variables estructurales</div>
+      <div class="trow"><span>PIB per cápita</span><span>22%</span></div>
+      <div class="trow"><span>Ranking FIFA</span><span>28%</span></div>
+      <div class="trow"><span>Población</span><span>15%</span></div>
+      <div class="trow"><span>Infraestructura</span><span>13%</span></div>
+      <div class="trow"><span>Historia Mundiales</span><span>10%</span></div>
+      <div class="trow"><span>Temperatura/Clima</span><span>12%</span></div>
+    </div>`;
+}
+
+// ==================== APUESTAS ====================
+function buildBetHtml(pred,home,away){
+  const pH=pred.pH,pD=pred.pD,pA=pred.pA;
+  const xg=parseFloat(pred.xgH)+parseFloat(pred.xgA);
+  let opts=[];
+  if(pH>0.4) opts.push({l:'1X2',v:`${home} Gana`,q:(1/pH).toFixed(2),r:`${(pH*100).toFixed(0)}%`});
+  if(pA>0.4) opts.push({l:'1X2',v:`${away} Gana`,q:(1/pA).toFixed(2),r:`${(pA*100).toFixed(0)}%`});
+  if(pD>0.30) opts.push({l:'Empate',v:'X',q:(1/pD).toFixed(2),r:`${(pD*100).toFixed(0)}%`});
+  opts.push({l:'Doble Oport.',v:pH>pA?`${home}/X`:`${away}/X`,q:pH>pA?(1/(pH+pD)).toFixed(2):(1/(pA+pD)).toFixed(2),r:'2 resultados'});
+  opts.push({l:'Total Goles',v:xg>2.5?'+2.5':'-2.5',q:xg>2.5?'1.85':'2.10',r:`xG: ${xg.toFixed(1)}`});
+  opts.push({l:'Marcador',v:pred.score,q:'6.50',r:'Más probable'});
+  if(pH>0.35) opts.push({l:home,v:'+1.5 goles',q:'2.40',r:'Ataque activo'});
+  if(pA>0.35) opts.push({l:away,v:'+1.5 goles',q:'2.40',r:'Ataque activo'});
+  return `<div class="bet-market">
+    <div class="bet-market-title">🎲 Recomendaciones BetPlay</div>
+    <div class="bet-odds">${opts.map(o=>`<div class="bet-option"><div class="blabel">${o.l}</div><div class="bval">${o.v}</div><div class="blabel">~${o.q}</div><div class="breason">${o.r}</div></div>`).join('')}</div>
+  </div>`;
+}
+
+// ==================== CALENDARIO — SEPARADO DE selectCalDay (FIX RECURSIÓN) ====================
+let calMonth=5; // Junio
+let calSelected=null;
+
+// renderCalendar: SOLO dibuja la grilla. NO llama a selectCalDay.
+function renderCalendar(){
+  const year=2026,month=calMonth;
+  const firstDay=new Date(year,month,1).getDay();
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  const names=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  document.getElementById('calMonthTitle').innerText=`${names[month]} ${year}`;
+  let html='';
+  for(let i=0;i<firstDay;i++) html+='<div></div>';
+  for(let d=1;d<=daysInMonth;d++){
+    const ds=`${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const hasMtch=!!(CALENDAR_MATCHES[ds]?.length);
+    const isSel=calSelected===ds;
+    const isPast=ds<todayStr;
+    html+=`<div class="cal-day${isPast?' past':''}${isSel?' active':''}${hasMtch?' has-match':''}" onclick="selectCalDay('${ds}')">
+      <div>${d}</div>${hasMtch?'<div class="cal-d-dot"></div>':''}
+    </div>`;
+  }
+  document.getElementById('calGrid').innerHTML=html;
+}
+
+// selectCalDay: actualiza estado, re-renderiza grilla (sin recursión), y muestra los partidos.
+function selectCalDay(ds){
+  calSelected=ds;
+  renderCalendar(); // seguro: renderCalendar ya NO llama de vuelta a selectCalDay
+  renderMatchPanel(ds);
+  // Scroll al panel de partidos para que sea visible sin tener que bajar manualmente
+  setTimeout(()=>{
+    const panel=document.getElementById('calDayMatches');
+    if(panel) panel.scrollIntoView({behavior:'smooth',block:'start'});
+  },50);
+}
+
+// renderMatchPanel: muestra los partidos del día dado.
+function renderMatchPanel(ds){
+  const matches=CALENDAR_MATCHES[ds]||[];
+  const container=document.getElementById('calDayMatches');
+  if(!matches.length){
+    container.innerHTML='<div class="card" style="text-align:center;color:var(--muted)">📭 Sin partidos este día</div>';
+    return;
+  }
+  const isPast=ds<todayStr;
+  container.innerHTML=matches.map(m=>{
+    const pred=ensemblePredict(m.home,m.away);
+    const kpred=klementPredict(m.home,m.away);
+    const real=REAL_RESULTS[`${m.home}-${m.away}`];
+    let resultHtml='', betHtml='';
+    if(isPast && real?.played){
+      resultHtml=`<div class="result-real"><div class="rscore">${real.h} — ${real.a}</div><div class="rlabel">Resultado final</div></div>`;
+      betHtml=`<div class="bet-market"><div class="bet-market-title">✅ Partido finalizado</div></div>`;
+    } else if(isPast && !real){
+      resultHtml=`<div class="no-result">⏳ Resultado no registrado aún</div>`;
+      betHtml=buildBetHtml(pred,m.home,m.away);
+    } else {
+      betHtml=buildBetHtml(pred,m.home,m.away);
+    }
+    return `<div class="mcard-dual">
+      <div class="match-header">
+        <div class="tflg">${FLAG(m.home)}</div>
+        <div class="tname">${m.home}</div>
+        <div style="font-size:11px;font-weight:900;padding:0 4px">vs</div>
+        <div class="tname" style="text-align:right">${m.away}</div>
+        <div class="tflg">${FLAG(m.away)}</div>
+        <div class="match-group">Grupo ${m.group} · ${m.time}</div>
+      </div>
+      <div class="model-grid">
+        <div class="model-box actual">
+          <div class="model-box-title">Modelo Actual</div>
+          <div class="model-probs-mini">
+            <div class="mprob-mini"><div class="mpv">${(pred.pH*100).toFixed(0)}%</div><div class="mlabel">Local</div></div>
+            <div class="mprob-mini"><div class="mpv">${(pred.pD*100).toFixed(0)}%</div><div class="mlabel">Emp</div></div>
+            <div class="mprob-mini"><div class="mpv">${(pred.pA*100).toFixed(0)}%</div><div class="mlabel">Visit</div></div>
           </div>
-          <div class="loan-card-amount currency">${formatCurrency(r.amount)}</div>
-          <div class="loan-card-balance">${bal > 0 ? 'Por descontar: ' + formatCurrency(bal) : 'Totalmente descontado'}</div>
-          ${instStatus && r.installments > 0 ? `<div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">Cuotas: ${instStatus.paidCount}/${r.installments} descontadas · ${formatCurrency(r.installmentAmount || 0)} c/u</div>` : ''}
-          ${bal > 0 ? `<div class="progress-bar"><div class="progress-fill ${pct > 75 ? 'success' : pct > 40 ? 'warning' : 'danger'}" style="width:${pct}%"></div></div>` : ''}
-          <div class="loan-card-actions" style="margin-top:14px;">
-            ${r.type === 'descuento' && r.installments > 0 && !r.deductFromLiquidation ? `<button class="btn btn-info btn-sm" onclick="event.stopPropagation();registerInstallmentPayment('${r.id}')">Descontar cuota</button>` : ''}
-            ${r.type === 'descuento' && r.deductFromLiquidation ? `<button class="btn btn-danger btn-sm" onclick="event.stopPropagation();registerLiquidationPayment('${r.id}')">Descontar liquidación</button>` : ''}
-            <button class="btn btn-success btn-sm" onclick="event.stopPropagation();openSheetAddPayment('${r.id}')">Abono</button>
-          </div>
-        </div>`;
-    }
-    
-    // ===== COPY TEACHER SUMMARY =====
-    function copyTeacherSummary(teacherId) {
-      const teacher = getTeachers().find(t => t.id === teacherId);
-      if (!teacher) return;
-      const now = new Date();
-      const monthDed = getMonthDeductions(teacherId, now.getFullYear(), now.getMonth());
-      const records = getRecords().filter(r => r.teacherId === teacherId).sort((a, b) => new Date(b.date) - new Date(a.date));
-      const allPayments = getPayments().filter(p => records.some(r => r.id === p.recordId)).sort((a, b) => new Date(b.date) - new Date(a.date));
-      
-      let text = `📋 RESUMEN DE NÓMINA — ${teacher.name.toUpperCase()}\n`;
-      text += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-      text += `💰 Salario bruto: ${formatCurrency(teacher.salary)}\n`;
-      text += `➖ Descuentos ${now.toLocaleDateString('es-CO', {month:'long'})}: ${formatCurrency(monthDed.total)}\n`;
-      if (monthDed.details.length > 0) {
-        monthDed.details.forEach(d => {
-          text += `   • Cuota ${d.installmentNumber} de ${d.record.concept || 'descuento'}: ${formatCurrency(d.amount)}\n`;
-        });
-      }
-      text += `✅ A pagar este mes: ${formatCurrency((teacher.salary || 0) - monthDed.total)}\n\n`;
-      
-      text += `📊 HISTORIAL COMPLETO\n`;
-      text += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-      if (records.length === 0) {
-        text += `No hay registros.\n`;
-      } else {
-        records.forEach(r => {
-          const typeInfo = RECORD_TYPES[r.type] || RECORD_TYPES.descuento;
-          const bal = getRecordBalance(r);
-          const paid = (r.amount || 0) - bal;
-          text += `\n${typeInfo.icon} ${typeInfo.label}${r.deductFromLiquidation ? ' (Liquidación)' : ''}\n`;
-          text += `   Concepto: ${r.concept || 'N/A'}\n`;
-          text += `   Fecha: ${formatDate(r.date)}\n`;
-          text += `   Monto total: ${formatCurrency(r.amount)}\n`;
-          text += `   Descontado: ${formatCurrency(paid)}\n`;
-          text += `   Por descontar: ${formatCurrency(bal)}\n`;
-          if (r.installments > 0) {
-            text += `   Cuotas: ${r.installments} de ${formatCurrency(r.installmentAmount || 0)} c/u\n`;
-            text += `   Desde: ${formatDate(r.startDate)} hasta ${formatDate(r.endDate)}\n`;
-          }
-        });
-      }
-      
-      text += `\n📅 DESCUENTOS REALIZADOS\n`;
-      text += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-      if (allPayments.length === 0) {
-        text += `Aún no se han realizado descuentos.\n`;
-      } else {
-        allPayments.forEach(p => {
-          const record = records.find(r => r.id === p.recordId);
-          const label = p.type === 'installment' ? `Cuota #${p.installmentNumber}` : p.type === 'liquidation' ? 'Liquidación' : 'Abono';
-          text += `• ${formatDate(p.date)} — ${label}: ${formatCurrency(p.amount)}\n`;
-        });
-      }
-      
-      text += `\n💡 Total adeudado: ${formatCurrency(getTeacherPrestamoBalance(teacherId) + getTeacherDescuentoBalance(teacherId) + getTeacherLiquidationBalance(teacherId))}\n`;
-      const liqBal = getTeacherLiquidationBalance(teacherId);
-      if (liqBal > 0) {
-        text += `⚠️ Total para liquidación: ${formatCurrency(liqBal)}\n`;
-      }
-      text += `Generado el ${now.toLocaleDateString('es-CO')}`;
-      
-      copyToClipboard(text);
-    }
-    
-    // ===== RECORD DETAIL =====
-    function showRecordDetail(recordId) {
-      currentRecordId = recordId;
-      renderRecordDetail();
-      showScreen('screenRecord');
-    }
-    function goBackFromRecord() {
-      const record = getRecords().find(r => r.id === currentRecordId);
-      if (record) showTeacherDetail(record.teacherId);
-      else showScreen('screenDashboard');
-    }
-    function renderRecordDetail() {
-      const record = getRecords().find(r => r.id === currentRecordId);
-      if (!record) return goBackFromRecord();
-      const teacher = getTeachers().find(t => t.id === record.teacherId);
-      const payments = getRecordPayments(record.id);
-      const balance = getRecordBalance(record);
-      const pct = record.amount > 0 ? ((record.amount - balance) / record.amount * 100) : 0;
-      const typeInfo = RECORD_TYPES[record.type] || RECORD_TYPES.descuento;
-      const instStatus = record.type === 'descuento' && record.installments > 0 ? getInstallmentStatus(record) : null;
-      
-      let content = `
-        <div class="detail-header animate-fade">
-          <div style="margin-bottom:12px;"><span class="type-badge ${typeInfo.class}">${typeInfo.icon} ${typeInfo.label}</span>${record.deductFromLiquidation ? ' <span class="badge-liquidation">Liquidación</span>' : ''}</div>
-          <div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;">${teacher ? escapeHtml(teacher.name) : ''}</div>
-          <div class="detail-name">${escapeHtml(record.concept || typeInfo.label)}</div>
-          <div class="detail-role">${formatDate(record.date)}</div>
-          <div class="detail-salary">Monto: <strong>${formatCurrency(record.amount)}</strong> · Por descontar: <strong style="color:${balance > 0 ? 'var(--danger)' : 'var(--success)'}">${formatCurrency(balance)}</strong></div>
-        </div>`;
-      
-      if (record.type === 'descuento' && record.installments > 0) {
-        content += `
-          <div class="dashboard-card animate-fade stagger-1" style="margin:16px 20px;">
-            <div class="dashboard-card-header">
-              <div>
-                <div class="dashboard-card-title">Plan de descuentos</div>
-                <div class="dashboard-card-subtitle">${record.deductFromLiquidation ? 'Descontar de liquidación final' : 'Descuentos de nómina'}</div>
-              </div>
-            </div>
-            <div class="condition-row"><span class="condition-label">Inicio descuento</span><span class="condition-value">${formatDate(record.startDate)}</span></div>
-            <div class="condition-row"><span class="condition-label">Fin descuento</span><span class="condition-value">${formatDate(record.endDate)}</span></div>
-            <div class="condition-row"><span class="condition-label">Número de cuotas</span><span class="condition-value">${record.installments}</span></div>
-            <div class="condition-row"><span class="condition-label">Monto por cuota</span><span class="condition-value">${formatCurrency(record.installmentAmount)}</span></div>
-            <div class="condition-row"><span class="condition-label">Día de descuento</span><span class="condition-value">${record.installmentDay || 'No definido'}</span></div>
-          </div>`;
-        
-        if (instStatus && instStatus.dates.length > 0) {
-          content += `
-            <div class="animate-fade stagger-2" style="padding:0 20px;">
-              <div class="installment-summary">
-                <div class="installment-summary-item"><div class="installment-summary-value" style="color:var(--success)">${instStatus.paidCount}</div><div class="installment-summary-label">Descontadas</div></div>
-                <div class="installment-summary-item"><div class="installment-summary-value" style="color:var(--warning)">${instStatus.remaining}</div><div class="installment-summary-label">Por descontar</div></div>
-                <div class="installment-summary-item"><div class="installment-summary-value" style="color:var(--accent-light)">${instStatus.nextIndex >= 0 ? instStatus.nextIndex + 1 : '-'}</div><div class="installment-summary-label">Próxima</div></div>
-              </div>
-              <div class="progress-bar" style="height:8px;"><div class="progress-fill ${pct > 75 ? 'success' : pct > 40 ? 'warning' : 'danger'}" style="width:${pct}%"></div></div>
-              <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:var(--text-muted);">
-                <span>${pct.toFixed(0)}% descontado</span>
-                <span>${formatCurrency(record.amount - balance)} de ${formatCurrency(record.amount)}</span>
-              </div>
-            </div>
-            <div class="animate-fade stagger-3" style="padding:0 20px;margin-top:20px;">
-              <div class="section-title" style="margin-top:0;">Calendario de descuentos</div>
-              <div class="installment-grid">`;
-          instStatus.dates.forEach((date, idx) => {
-            const isPaid = idx < instStatus.paidCount;
-            const isNext = idx === instStatus.nextIndex;
-            const d = new Date(date + 'T00:00:00');
-            content += `<div class="installment-cell ${isPaid ? 'paid' : 'pending'} ${isNext ? 'next' : ''}" title="${formatDate(date)}">${d.getDate()}</div>`;
-          });
-          content += `</div>
-              <div class="installment-legend">
-                <div class="installment-legend-item"><div class="installment-legend-dot" style="background:rgba(52,211,153,0.3);"></div>Descontada</div>
-                <div class="installment-legend-item"><div class="installment-legend-dot" style="background:rgba(255,255,255,0.05);border:1px solid var(--border-glass);"></div>Por descontar</div>
-                <div class="installment-legend-item"><div class="installment-legend-dot" style="box-shadow:0 0 0 2px var(--accent);background:transparent;"></div>Próxima</div>
-              </div>
-            </div>`;
-        }
-      }
-      
-      content += `
-        <div class="action-row animate-fade stagger-4">
-          ${record.type === 'descuento' && record.installments > 0 && !record.deductFromLiquidation ? `<button class="btn btn-info" onclick="registerInstallmentPayment('${record.id}')">Descontar cuota</button>` : ''}
-          ${record.type === 'descuento' && record.deductFromLiquidation ? `<button class="btn btn-danger" onclick="registerLiquidationPayment('${record.id}')">Descontar liquidación</button>` : ''}
-          <button class="btn btn-success" onclick="openSheetAddPayment('${record.id}')">Abono libre</button>
+          <div class="mscore">Marcador: ${pred.score}</div>
         </div>
-        <div class="section-title" style="padding:0 20px;">Historial de descuentos</div>
-        <div class="content" style="padding-top:0;">`;
-      
-      if (payments.length === 0) {
-        content += `
-          <div class="empty-state animate-fade">
-            <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-            <div class="empty-title">Sin descuentos</div>
-            <div class="empty-text">Aún no se han registrado descuentos para este registro.</div>
-          </div>`;
-      } else {
-        content += payments.map((p, i) => `
-          <div class="timeline-item animate-fade stagger-${Math.min(i+1, 5)}">
-            <div class="timeline-dot ${p.type === 'installment' ? 'installment' : p.type === 'liquidation' ? 'liquidation' : 'payment'}">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                ${p.type === 'installment' ? '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>' : p.type === 'liquidation' ? '<path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>' : '<polyline points="20 6 9 17 4 12"/>'}
-              </svg>
-            </div>
-            <div class="timeline-content">
-              <div class="timeline-title">${p.type === 'installment' ? 'Descuento cuota #' + (p.installmentNumber || '') : p.type === 'liquidation' ? 'Descuento de liquidación' : 'Abono libre'}</div>
-              <div class="timeline-date">${formatDate(p.date)}${p.notes ? ' · ' + escapeHtml(p.notes) : ''}</div>
-            </div>
-            <div class="timeline-amount positive">${formatCurrency(p.amount)}</div>
+        <div class="model-box klement">
+          <div class="model-box-title">Klement</div>
+          <div class="model-probs-mini">
+            <div class="mprob-mini"><div class="mpv">${(kpred.pH*100).toFixed(0)}%</div><div class="mlabel">Local</div></div>
+            <div class="mprob-mini"><div class="mpv">${(kpred.pD*100).toFixed(0)}%</div><div class="mlabel">Emp</div></div>
+            <div class="mprob-mini"><div class="mpv">${(kpred.pA*100).toFixed(0)}%</div><div class="mlabel">Visit</div></div>
           </div>
-        `).join('');
-      }
-      content += `</div>`;
-      $('recordDetailContent').innerHTML = content;
-    }
-    
-    // ===== SHEETS: ADD TEACHER =====
-    function openSheetAddTeacher() {
-      openSheet(`
-        <div class="sheet-title">Nuevo Docente</div>
-        <form onsubmit="event.preventDefault(); saveTeacher();">
-          <div class="input-group"><label>Nombre completo</label><input type="text" class="input" id="tName" placeholder="Ej: María González" required></div>
-          <div class="input-group"><label>Cargo / Asignatura</label><input type="text" class="input" id="tRole" placeholder="Ej: Profesora de Matemáticas"></div>
-          <div class="input-group"><label>Salario mensual</label><input type="text" inputmode="numeric" pattern="[0-9]*" class="input" id="tSalary" placeholder="Ej: 2500000" min="0" step="1000"></div>
-          <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;">Guardar Docente</button>
-        </form>
-      `);
-      setTimeout(() => $('tName').focus(), 350);
-    }
-    function saveTeacher() {
-      const name = $('tName').value.trim();
-      const role = $('tRole').value.trim();
-      const salary = parseMoney($('tSalary').value);
-      if (!name) { showToast('Ingresa el nombre del docente', 'error'); return; }
-      const teachers = getTeachers();
-      teachers.push({ id: DB.id(), name, role, salary, createdAt: DB.now() });
-      setTeachers(teachers);
-      closeSheet();
-      showToast('Docente agregado');
-      renderDashboard();
-    }
-    
-    // ===== SHEETS: ADD RECORD =====
-    let selectedRecordType = 'prestamo';
-    function openSheetAddLoan() {
-      const teachers = getTeachers();
-      if (teachers.length === 0) {
-        openSheet(`
-          <div class="sheet-title">Nuevo Registro</div>
-          <div class="empty-state" style="padding:40px 0;">
-            <div class="empty-icon" style="width:60px;height:60px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
-            <div class="empty-title">Primero agrega un docente</div>
-            <div class="empty-text">Necesitas registrar al menos un docente antes de crear un registro.</div>
-          </div>
-          <button class="btn btn-primary btn-block" onclick="closeSheet();setTimeout(openSheetAddTeacher,300);">Agregar Docente</button>
-        `);
-        return;
-      }
-      const options = teachers.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
-      selectedRecordType = 'prestamo';
-      openSheet(`
-        <div class="sheet-title">Nuevo Registro</div>
-        <form onsubmit="event.preventDefault(); saveRecord();">
-          <div class="input-group"><label>Tipo</label>
-            <div class="radio-group">
-              <div class="radio-option selected" onclick="selectRecordType(this, 'prestamo')" data-type="prestamo"><div class="radio-icon">💰</div><div class="radio-label">Préstamo</div><div class="radio-sublabel">Debe devolver</div></div>
-              <div class="radio-option" onclick="selectRecordType(this, 'descuento')" data-type="descuento"><div class="radio-icon">📋</div><div class="radio-label">Descuento</div><div class="radio-sublabel">De nómina</div></div>
-            </div>
-          </div>
-          <div class="input-group"><label>Docente</label><select class="input" id="rTeacher" required>${options}</select></div>
-          <div class="input-group" id="conceptGroup" style="display:none;"><label>Concepto</label><input type="text" class="input" id="rConcept" placeholder="Ej: Uniforme, material, multa..."></div>
-          <div class="input-group"><label>Monto</label><input type="text" inputmode="numeric" pattern="[0-9]*" class="input" id="rAmount" placeholder="Ej: 500000" min="1" step="1000" required></div>
-          <div class="input-group"><label>Fecha</label><input type="date" class="input" id="rDate" required></div>
-          <div id="descuentoOptions" style="display:none;">
-            <div style="background:var(--bg-glass);border-radius:var(--radius-sm);padding:16px;margin-bottom:20px;border:1px solid var(--border-glass);">
-              <div style="font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.8px;">Plan de descuentos</div>
-              <div class="input-group"><label>Inicio descuento</label><input type="date" class="input" id="rStartDate"></div>
-              <div class="input-group"><label>Número de cuotas</label><input type="text" inputmode="numeric" pattern="[0-9]*" class="input" id="rInstallments" placeholder="Ej: 3" min="1" max="48" onchange="calculateRecordInstallment()"></div>
-              <div class="input-group"><label>Día de descuento (del mes)</label><input type="text" inputmode="numeric" pattern="[0-9]*" class="input" id="rInstallmentDay" placeholder="Ej: 15" min="1" max="31" onchange="calculateRecordInstallment()"></div>
-              <div style="display:flex;gap:10px;">
-                <div class="input-group" style="flex:1;"><label>Monto cuota</label><input type="text" inputmode="numeric" pattern="[0-9]*" class="input" id="rInstallmentAmount" placeholder="Calculado" min="1" step="1000" onchange="calculateRecordInstallmentsFromAmount()"></div>
-                <div class="input-group" style="flex:1;"><label>Fin descuento</label><input type="date" class="input" id="rEndDate" readonly style="color:var(--text-muted);"></div>
-              </div>
-            </div>
-            <div class="checkbox-row" onclick="document.getElementById('rLiquidation').click();">
-              <input type="checkbox" id="rLiquidation" onchange="toggleLiquidation()">
-              <label for="rLiquidation">Descontar de la liquidación final</label>
-            </div>
-            <div id="liquidationWarning" style="display:none;background:rgba(220,38,38,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:var(--radius-sm);padding:12px;margin-bottom:16px;font-size:13px;color:var(--danger);">
-              ⚠️ Este descuento se descontará completamente de la liquidación final del docente.
-            </div>
-          </div>
-          <div class="input-group"><label>Notas adicionales</label><input type="text" class="input" id="rNotes" placeholder="Ej: Urgente, descontar antes de vacaciones"></div>
-          <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;">Guardar</button>
-        </form>
-      `);
-      $('rDate').valueAsDate = new Date();
-      setTimeout(() => $('rAmount').focus(), 350);
-    }
-    function selectRecordType(el, type) {
-      document.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
-      el.classList.add('selected');
-      selectedRecordType = type;
-      const conceptGroup = $('conceptGroup');
-      const descuentoOptions = $('descuentoOptions');
-      if (conceptGroup) conceptGroup.style.display = type === 'descuento' ? 'block' : 'none';
-      if (descuentoOptions) descuentoOptions.style.display = type === 'descuento' ? 'block' : 'none';
-    }
-    function toggleLiquidation() {
-      const warning = $('liquidationWarning');
-      const isChecked = $('rLiquidation').checked;
-      if (warning) warning.style.display = isChecked ? 'block' : 'none';
-    }
-    function calculateRecordInstallment() {
-      const amount = parseMoney($('rAmount').value);
-      const installments = parseInt($('rInstallments').value) || 0;
-      const startDate = $('rStartDate').value;
-      if (amount > 0 && installments > 0) {
-        const amt = Math.round(amount / installments);
-        $('rInstallmentAmount').value = amt;
-      }
-      if (startDate && installments > 0) {
-        const end = addMonths(startDate, installments - 1);
-        $('rEndDate').value = end;
-      }
-    }
-    function calculateRecordInstallmentsFromAmount() {
-      const amount = parseMoney($('rAmount').value);
-      const installmentAmount = parseMoney($('rInstallmentAmount').value);
-      const startDate = $('rStartDate').value;
-      if (amount > 0 && installmentAmount > 0) {
-        const installments = Math.max(1, Math.ceil(amount / installmentAmount));
-        $('rInstallments').value = installments;
-      }
-      if (startDate && $('rInstallments').value) {
-        const end = addMonths(startDate, parseInt($('rInstallments').value) - 1);
-        $('rEndDate').value = end;
-      }
-    }
-    function openSheetAddRecordForTeacher() {
-      const teacher = getTeachers().find(t => t.id === currentTeacherId);
-      if (!teacher) return;
-      selectedRecordType = 'prestamo';
-      openSheet(`
-        <div class="sheet-title">Nuevo Registro — ${escapeHtml(teacher.name)}</div>
-        <form onsubmit="event.preventDefault(); saveRecord('${teacher.id}');">
-          <div class="input-group"><label>Tipo</label>
-            <div class="radio-group">
-              <div class="radio-option selected" onclick="selectRecordType(this, 'prestamo')" data-type="prestamo"><div class="radio-icon">💰</div><div class="radio-label">Préstamo</div><div class="radio-sublabel">Debe devolver</div></div>
-              <div class="radio-option" onclick="selectRecordType(this, 'descuento')" data-type="descuento"><div class="radio-icon">📋</div><div class="radio-label">Descuento</div><div class="radio-sublabel">De nómina</div></div>
-            </div>
-          </div>
-          <div class="input-group" id="conceptGroup" style="display:none;"><label>Concepto</label><input type="text" class="input" id="rConcept" placeholder="Ej: Uniforme, material, multa..."></div>
-          <div class="input-group"><label>Monto</label><input type="text" inputmode="numeric" pattern="[0-9]*" class="input" id="rAmount" placeholder="Ej: 500000" min="1" step="1000" required></div>
-          <div class="input-group"><label>Fecha</label><input type="date" class="input" id="rDate" required></div>
-          <div id="descuentoOptions" style="display:none;">
-            <div style="background:var(--bg-glass);border-radius:var(--radius-sm);padding:16px;margin-bottom:20px;border:1px solid var(--border-glass);">
-              <div style="font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.8px;">Plan de descuentos</div>
-              <div class="input-group"><label>Inicio descuento</label><input type="date" class="input" id="rStartDate"></div>
-              <div class="input-group"><label>Número de cuotas</label><input type="text" inputmode="numeric" pattern="[0-9]*" class="input" id="rInstallments" placeholder="Ej: 3" min="1" max="48" onchange="calculateRecordInstallment()"></div>
-              <div class="input-group"><label>Día de descuento (del mes)</label><input type="text" inputmode="numeric" pattern="[0-9]*" class="input" id="rInstallmentDay" placeholder="Ej: 15" min="1" max="31" onchange="calculateRecordInstallment()"></div>
-              <div style="display:flex;gap:10px;">
-                <div class="input-group" style="flex:1;"><label>Monto cuota</label><input type="text" inputmode="numeric" pattern="[0-9]*" class="input" id="rInstallmentAmount" placeholder="Calculado" min="1" step="1000" onchange="calculateRecordInstallmentsFromAmount()"></div>
-                <div class="input-group" style="flex:1;"><label>Fin descuento</label><input type="date" class="input" id="rEndDate" readonly style="color:var(--text-muted);"></div>
-              </div>
-            </div>
-            <div class="checkbox-row" onclick="document.getElementById('rLiquidation').click();">
-              <input type="checkbox" id="rLiquidation" onchange="toggleLiquidation()">
-              <label for="rLiquidation">Descontar de la liquidación final</label>
-            </div>
-            <div id="liquidationWarning" style="display:none;background:rgba(220,38,38,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:var(--radius-sm);padding:12px;margin-bottom:16px;font-size:13px;color:var(--danger);">
-              ⚠️ Este descuento se descontará completamente de la liquidación final del docente.
-            </div>
-          </div>
-          <div class="input-group"><label>Notas adicionales</label><input type="text" class="input" id="rNotes" placeholder="Ej: Urgente, descontar antes de vacaciones"></div>
-          <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;">Guardar</button>
-        </form>
-      `);
-      $('rDate').valueAsDate = new Date();
-      setTimeout(() => $('rAmount').focus(), 350);
-    }
-    function saveRecord(forcedTeacherId) {
-      const teacherId = forcedTeacherId || $('rTeacher').value;
-      const amount = parseMoney($('rAmount').value);
-      const date = $('rDate').value;
-      const concept = $('rConcept') ? $('rConcept').value.trim() : '';
-      const startDate = $('rStartDate') ? $('rStartDate').value : '';
-      const endDate = $('rEndDate') ? $('rEndDate').value : '';
-      const installments = parseInt($('rInstallments') ? $('rInstallments').value : 0) || 0;
-      const installmentAmount = parseMoney($('rInstallmentAmount') ? $('rInstallmentAmount').value : 0);
-      const installmentDay = parseInt($('rInstallmentDay') ? $('rInstallmentDay').value : 0) || null;
-      const deductFromLiquidation = $('rLiquidation') ? $('rLiquidation').checked : false;
-      const notes = $('rNotes').value.trim();
-      
-      if (!teacherId || amount <= 0 || !date) { showToast('Completa los campos obligatorios', 'error'); return; }
-      if (selectedRecordType === 'descuento' && !concept) { showToast('Ingresa el concepto del descuento', 'error'); return; }
-      
-      const records = getRecords();
-      records.push({
-        id: DB.id(), teacherId, type: selectedRecordType, concept, amount, date,
-        startDate, endDate, installments, installmentAmount, installmentDay,
-        deductFromLiquidation, notes, status: 'active', createdAt: DB.now()
-      });
-      setRecords(records);
-      closeSheet();
-      showToast('Registro guardado');
-      if (currentTeacherId === teacherId) renderTeacherDetail();
-      else if ($('screenDashboard').classList.contains('active')) renderDashboard();
-    }
-    
-    // ===== PAYMENTS =====
-    function openSheetAddPayment(recordId) {
-      const record = getRecords().find(r => r.id === recordId);
-      if (!record) return;
-      const teacher = getTeachers().find(t => t.id === record.teacherId);
-      const balance = getRecordBalance(record);
-      openSheet(`
-        <div class="sheet-title">Registrar Abono</div>
-        <div style="background:var(--bg-card);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:20px;border:1px solid var(--border-glass);">
-          <div style="font-size:13px;color:var(--text-secondary);margin-bottom:4px;">Saldo por descontar</div>
-          <div style="font-size:20px;font-weight:700;color:var(--danger);">${formatCurrency(balance)}</div>
-          ${teacher ? `<div style="font-size:12px;color:var(--text-muted);margin-top:6px;">Docente: ${escapeHtml(teacher.name)}</div>` : ''}
+          <div class="mscore">Marcador: ${kpred.score}</div>
         </div>
-        <form onsubmit="event.preventDefault(); savePayment('${recordId}');">
-          <div class="input-group"><label>Monto del abono</label><input type="text" inputmode="numeric" pattern="[0-9]*" class="input" id="pAmount" placeholder="Ej: 200000" min="1" max="${balance}" step="1000" required></div>
-          <div class="input-group"><label>Fecha</label><input type="date" class="input" id="pDate" required></div>
-          <div class="input-group"><label>Notas (opcional)</label><input type="text" class="input" id="pNotes" placeholder="Ej: Pago en efectivo"></div>
-          <button type="submit" class="btn btn-success btn-block" style="margin-top:8px;">Registrar Abono</button>
-        </form>
-      `);
-      $('pDate').valueAsDate = new Date();
-      setTimeout(() => $('pAmount').focus(), 350);
+      </div>
+      ${betHtml}
+      ${resultHtml}
+    </div>`;
+  }).join('');
+}
+
+function changeMonth(dir){
+  calMonth=Math.max(5,Math.min(7,calMonth+dir));
+  renderCalendar();
+  // Si hay día seleccionado en este mes, mantenerlo; si no, limpiar panel
+  const yr=2026,mo=calMonth;
+  const dsPrefix=`${yr}-${String(mo+1).padStart(2,'0')}`;
+  if(calSelected && !calSelected.startsWith(dsPrefix)){
+    // buscar primer día con partido en el mes nuevo
+    const fechas=Object.keys(CALENDAR_MATCHES).filter(d=>d.startsWith(dsPrefix)).sort();
+    if(fechas.length){selectCalDay(fechas[0]);} else {
+      document.getElementById('calDayMatches').innerHTML='<div class="card" style="text-align:center;color:var(--muted)">📭 Sin partidos en este mes</div>';
     }
-    function registerInstallmentPayment(recordId) {
-      const record = getRecords().find(r => r.id === recordId);
-      if (!record) return;
-      const instStatus = getInstallmentStatus(record);
-      if (instStatus.nextIndex < 0 || instStatus.nextIndex >= record.installments) {
-        showToast('Todas las cuotas ya fueron descontadas', 'warning');
-        return;
-      }
-      const amount = record.installmentAmount || 0;
-      const date = todayStr();
-      const payments = getPayments();
-      payments.push({
-        id: DB.id(), recordId, amount, date, notes: 'Descuento cuota #' + (instStatus.nextIndex + 1),
-        type: 'installment', installmentNumber: instStatus.nextIndex + 1, createdAt: DB.now()
-      });
-      setPayments(payments);
-      const newBalance = getRecordBalance(record);
-      if (newBalance <= 0) {
-        const records = getRecords();
-        const idx = records.findIndex(r => r.id === recordId);
-        if (idx >= 0) { records[idx].status = 'paid'; setRecords(records); }
-      }
-      showToast('Cuota #' + (instStatus.nextIndex + 1) + ' descontada');
-      if (currentRecordId === recordId) renderRecordDetail();
-      else if (currentTeacherId === record.teacherId) renderTeacherDetail();
-      else if ($('screenDashboard').classList.contains('active')) renderDashboard();
+  } else if(calSelected){
+    renderMatchPanel(calSelected);
+  }
+}
+
+function showTab(el,name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  if(el) el.classList.add('active');
+  document.getElementById(`page-${name}`).classList.add('active');
+  if(name==='champ') renderChamp();
+  else if(name==='groups') renderGroups();
+  else if(name==='calendar'){ renderCalendar(); if(calSelected) renderMatchPanel(calSelected); }
+  else if(name==='duel') renderDuel();
+  else if(name==='model') renderModel();
+}
+
+// ==================== PROGRESO Y BOOT ====================
+function setProgress(p,msg){
+  document.getElementById('progFill').style.width=Math.min(100,p)+'%';
+  document.getElementById('stepMsg').innerText=msg;
+}
+
+async function boot(){
+  setProgress(5,'Inicializando ELO…'); initElo();
+  setProgress(15,'Monte Carlo — Modelo Actual (20k)…');
+  await runMC(20000,'actual',res=>{G.mc=res;});
+  setProgress(60,'Monte Carlo — Klement (20k)…');
+  await runMC(20000,'klement',res=>{K_MC=res;});
+  setProgress(100,'¡Listo!');
+  document.getElementById('statusDot').className='sdot ok';
+  document.getElementById('modelScore').innerText='✓ OK';
+  setTimeout(()=>{
+    document.getElementById('overlay').classList.add('gone');
+    renderChamp(); renderGroups(); renderDuel(); renderModel();
+    // === Selección automática del día actual (o primer día con partido) ===
+    renderCalendar();
+    const hoy=todayStr;
+    let autoDate=null;
+    if(CALENDAR_MATCHES[hoy]?.length) autoDate=hoy;
+    else {
+      const todas=Object.keys(CALENDAR_MATCHES).sort();
+      // buscar próxima fecha con partidos desde hoy
+      autoDate=todas.find(d=>d>=hoy) || todas[0];
     }
-    function registerLiquidationPayment(recordId) {
-      const record = getRecords().find(r => r.id === recordId);
-      if (!record) return;
-      const balance = getRecordBalance(record);
-      if (balance <= 0) { showToast('Este descuento ya está completado', 'warning'); return; }
-      const payments = getPayments();
-      payments.push({
-        id: DB.id(), recordId, amount: balance, date: todayStr(),
-        notes: 'Descuento de liquidación final', type: 'liquidation', createdAt: DB.now()
-      });
-      setPayments(payments);
-      const records = getRecords();
-      const idx = records.findIndex(r => r.id === recordId);
-      if (idx >= 0) { records[idx].status = 'paid'; setRecords(records); }
-      showToast('Descuento de liquidación registrado');
-      if (currentRecordId === recordId) renderRecordDetail();
-      else if (currentTeacherId === record.teacherId) renderTeacherDetail();
-      else if ($('screenDashboard').classList.contains('active')) renderDashboard();
+    if(autoDate){
+      // Asegurarse de que el mes del calendario coincide
+      const mo=parseInt(autoDate.split('-')[1])-1;
+      if(mo!==calMonth){ calMonth=mo; }
+      selectCalDay(autoDate);
     }
-    function savePayment(recordId) {
-      const amount = parseMoney($('pAmount').value);
-      const date = $('pDate').value;
-      const notes = $('pNotes').value.trim();
-      const record = getRecords().find(r => r.id === recordId);
-      if (!record || amount <= 0 || !date) { showToast('Completa todos los campos', 'error'); return; }
-      const balance = getRecordBalance(record);
-      if (amount > balance) { showToast('El monto excede el saldo por descontar', 'error'); return; }
-      const payments = getPayments();
-      payments.push({ id: DB.id(), recordId, amount, date, notes, type: 'payment', createdAt: DB.now() });
-      setPayments(payments);
-      const newBalance = balance - amount;
-      if (newBalance <= 0) {
-        const records = getRecords();
-        const idx = records.findIndex(r => r.id === recordId);
-        if (idx >= 0) { records[idx].status = 'paid'; setRecords(records); }
-      }
-      closeSheet();
-      showToast('Abono registrado');
-      if (currentRecordId === recordId) renderRecordDetail();
-      else if (currentTeacherId === record.teacherId) renderTeacherDetail();
-      else if ($('screenDashboard').classList.contains('active')) renderDashboard();
-    }
-    
-    // ===== DATA MENU =====
-    function showDataMenu() {
-      $('menuOverlay').classList.add('active');
-      $('menuSheet').classList.add('active');
-    }
-    function closeDataMenu() {
-      $('menuSheet').classList.remove('active');
-      $('menuOverlay').classList.remove('active');
-    }
-    function exportData() {
-      const data = { teachers: getTeachers(), records: getRecords(), payments: getPayments(), exportedAt: new Date().toISOString() };
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'edu-descuentos-backup-' + new Date().toISOString().split('T')[0] + '.json';
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast('Datos exportados');
-    }
-    function importData() {
-      $('importFile').click();
-    }
-    function handleImportFile(input) {
-      const file = input.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => {
-        try {
-          const data = JSON.parse(e.target.result);
-          if (data.teachers) setTeachers(data.teachers);
-          if (data.records || data.loans) setRecords(data.records || data.loans);
-          if (data.payments) setPayments(data.payments);
-          showToast('Datos importados correctamente');
-          renderDashboard();
-          showScreen('screenDashboard');
-        } catch(err) {
-          showToast('Error al importar: archivo inválido', 'error');
-        }
-      };
-      reader.readAsText(file);
-      input.value = '';
-    }
-    function confirmResetData() {
-      openSheet(`
-        <div class="sheet-title" style="color:var(--danger)">¿Borrar todo?</div>
-        <p style="text-align:center;color:var(--text-secondary);font-size:14px;margin-bottom:24px;">Esta acción eliminará todos los docentes, registros y descuentos. No se puede deshacer.</p>
-        <div style="display:flex;gap:10px;">
-          <button class="btn btn-secondary btn-block" onclick="closeSheet()">Cancelar</button>
-          <button class="btn btn-danger btn-block" onclick="resetAllData()">Sí, borrar todo</button>
-        </div>
-      `);
-    }
-    function resetAllData() {
-      localStorage.removeItem(KEYS.TEACHERS);
-      localStorage.removeItem(KEYS.RECORDS);
-      localStorage.removeItem(KEYS.PAYMENTS);
-      closeSheet();
-      showToast('Todos los datos han sido eliminados');
-      currentTeacherId = null;
-      currentRecordId = null;
-      renderDashboard();
-      showScreen('screenDashboard');
-      setNavActive('navDashboard');
-    }
-    
-    // ===== INIT =====
-    renderDashboard();
-  </script>
+  },500);
+}
+
+boot();
+</script>
 </body>
 </html>
